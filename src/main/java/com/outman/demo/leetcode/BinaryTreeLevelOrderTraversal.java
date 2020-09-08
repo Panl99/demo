@@ -1,5 +1,6 @@
 package com.outman.demo.leetcode;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -23,6 +24,8 @@ public class BinaryTreeLevelOrderTraversal {
      * 标签：树、广度优先遍历
      * 示例：给定二叉树 [3,9,20,null,null,15,7]。返回 [ [15,7], [9,20], [3] ]
      * 思路：可以使用队列实现，队列先进先出 符合一层一层遍历的逻辑。（栈：先进后出 适合深度优先遍历 也就是递归的逻辑）
+     * 时间复杂度：O(N)
+     * 空间复杂度：O(N)
      */
     public static List<List<Integer>> levelOrderBottom(TreeNode root) {
         //需要使用LinkedList初始化，不然找不到addFirst方法
@@ -70,6 +73,9 @@ public class BinaryTreeLevelOrderTraversal {
         //从上向下的层次遍历
         List<List<Integer>> list2 = levelOrder(tree);
         System.out.println(list2);
+
+        //层序遍历二叉树，返回[3, 9, 20, 15, 7]
+        System.out.println(PrintFromTopToBottom(tree));
     }
 
     /**
@@ -110,5 +116,31 @@ public class BinaryTreeLevelOrderTraversal {
             result.add(oneLevel);
         }
         return result;
+    }
+
+    /**
+     * 剑指offer23:层序遍历二叉树
+     * @param root
+     * @return [3, 9, 20, 15, 7]
+     * 解法一：迭代，间复杂度：O(n)，空间复杂度：O(n)
+     */
+    public static ArrayList<Integer> PrintFromTopToBottom(TreeNode root) {
+        ArrayList<Integer> list = new ArrayList<>();
+        if (root == null) {
+            return list;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            list.add(node.val);
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+        return list;
     }
 }
