@@ -70,16 +70,18 @@ public class TreeDemo {
      * 标签：树
      * 示例：给定二叉树 [3,9,20,null,null,15,7]。在这个二叉树中，有两个左叶子，分别是 9 和 15，所以返回 24
      * 思路：递归
-     * 时间复杂度：O(N)
-     * 空间复杂度：O(N)
+     * 时间复杂度：
+     * 空间复杂度：
      */
     public static int sumOfLeftLeaves(TreeNode root) {
         if (root == null) {
             return 0;
         }
-        return sumOfLeftLeaves(root.left)
-                + sumOfLeftLeaves(root.right)
-                + (root.left != null && root.left.left == null && root.left.right == null ? root.left.val : 0);
+        int sum = 0;
+        if (root.left != null && root.left.left == null && root.left.right == null) {
+            sum = root.left.val;
+        }
+        return sum + sumOfLeftLeaves(root.left) + sumOfLeftLeaves(root.right);
     }
 
     /**
