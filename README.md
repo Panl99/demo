@@ -11,6 +11,7 @@
 
 - [数组](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/ArrayDemo.java)
     - 二维数组中查找目标值
+    - 子集(位运算)
 - [树](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/TreeDemo.java)
     - 左叶子之和
     - 二叉树的层次遍历
