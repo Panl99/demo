@@ -10,13 +10,6 @@ import java.util.Queue;
  * @auther outman
  **/
 public class TreeDemo {
-     public static class TreeNode {
-         int val;
-         TreeNode left;
-         TreeNode right;
-         TreeNode(int x) { val = x; }
-     }
-
     public static void main(String[] args) {
         TreeNode tree = new TreeNode(3);
         tree.left = new TreeNode(9);
@@ -64,12 +57,22 @@ public class TreeDemo {
     }
 
     /**
+     * 树节点
+     */
+    public static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int x) { val = x; }
+    }
+
+    /**
      * 链接：https://leetcode-cn.com/problems/sum-of-left-leaves/
      * 题目：404. 左叶子之和
      * 描述：计算给定二叉树的所有左叶子之和。
      * 标签：树
      * 示例：给定二叉树 [3,9,20,null,null,15,7]。在这个二叉树中，有两个左叶子，分别是 9 和 15，所以返回 24
-     * 思路：递归
+     * 思路：递归，一个节点存在左子节点，且左子节点不存在子节点，那么左子节点为该节点的左叶子。
      * 时间复杂度：
      * 空间复杂度：
      */
