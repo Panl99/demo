@@ -1,7 +1,8 @@
-# demo
+# doc
 > [剑指Offer.pdf](https://github.com/Panl99/demo/tree/master/src/main/resources/static/doc/剑指Offer.pdf)
 >> [剑指Offer 第二版](https://www.cnblogs.com/52yu/p/13352567.html)
 
+# leetcode
 ------
 - [单例模式](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/Singleton.java)
 
@@ -23,9 +24,13 @@
     - 24、反转链表
     - 25、合并两个排序的链表
     - 52、两个链表的第一个公共节点
-    
 
-## 剑指Offer
+------
+# demo
+- [ConcurrentHashSet：利用ConcurrentHashMap实现](https://github.com/Panl99/demo/tree/master/src/main/java/com/outman/demo/util/ConcurrentHashSet.java)
+   
+------
+# 剑指Offer
 - 基础扎实全面：编程语言、数据结构、算法等
 - 高质量代码：正确、完整、鲁棒（考虑边界条件、特殊输入(null、空串)、错误处理）
 - 思路清晰：分析、解决复杂问题
