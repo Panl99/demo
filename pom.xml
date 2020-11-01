@@ -14,10 +14,31 @@
     <name>demo</name>
     <description>Demo project for Spring Boot</description>
 
+    <modules>
+        <module>demo-client</module>
+        <module>demo-config</module>
+        <module>demo-register</module>
+    </modules>
+
     <properties>
         <java.version>1.8</java.version>
-        <spring.cloud.version>2.2.5.RELEASE</spring.cloud.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <skipTests>true</skipTests>
+<!--        <spring.cloud.version>2.2.5.RELEASE</spring.cloud.version>-->
     </properties>
+    <!--依赖spring-cloud最新版本，保持各组件间兼容-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Hoxton.SR8</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!--spring boot start-->
@@ -57,7 +78,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!--spring cloud end-->
+        <!--spring boot end-->
 
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -81,12 +102,10 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-            <version>${spring.cloud.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <version>${spring.cloud.version}</version>
         </dependency>
         <!--spring cloud end-->
 
