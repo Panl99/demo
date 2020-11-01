@@ -1,23 +1,23 @@
 # doc
-> [剑指Offer.pdf](https://github.com/Panl99/demo/tree/master/src/main/resources/static/doc/剑指Offer.pdf)
+> [剑指Offer.pdf](https://github.com/Panl99/demo/tree/master/demo-client/src/main/resources/static/doc/剑指Offer.pdf)
 >> [剑指Offer 第二版](https://www.cnblogs.com/52yu/p/13352567.html)
 
 # leetcode
 ------
-- [单例模式](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/Singleton.java)
+- [单例模式](https://github.com/Panl99/demo/tree/master/demo-client/src/main/java/com/outman/democlient/leetcode/Singleton.java)
 
 ------
-- [LeetCode.java](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/LeetCode.java)
-- [前K个高频元素](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/TopkFrequentElements.java)
+- [LeetCode.java](https://github.com/Panl99/demo/tree/master/demo-client/src/main/java/com/outman/democlient/leetcode/LeetCode.java)
+- [前K个高频元素](https://github.com/Panl99/demo/tree/master/demo-client/src/main/java/com/outman/democlient/leetcode/TopkFrequentElements.java)
 
-- [数组](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/ArrayDemo.java)
+- [数组](https://github.com/Panl99/demo/tree/master/demo-client/src/main/java/com/outman/democlient/leetcode/ArrayDemo.java)
     - 4、二维数组中查找目标值（从右上角开始查找）
     - 子集(位运算)
-- [树](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/TreeDemo.java)
+- [树](https://github.com/Panl99/demo/tree/master/demo-client/src/main/java/com/outman/democlient/leetcode/TreeDemo.java)
     - 左叶子之和（递归）
     - 二叉树的层次遍历（广度优先遍历，队列、迭代）
     - 翻转二叉树（递归）
-- [链表](https://github.com/Panl99/demo/blob/master/src/main/java/com/outman/demo/leetcode/ListDemo.java)
+- [链表](https://github.com/Panl99/demo/tree/master/demo-client/src/main/java/com/outman/democlient/leetcode/ListDemo.java)
     - 6、从尾到头打印链表(栈、递归)
     - 18、删除链表的节点
     - 22、链表中倒数第k个节点
@@ -27,7 +27,7 @@
 
 ------
 # demo
-- [ConcurrentHashSet：利用ConcurrentHashMap实现](https://github.com/Panl99/demo/tree/master/src/main/java/com/outman/demo/util/ConcurrentHashSet.java)
+- [ConcurrentHashSet：利用ConcurrentHashMap实现](https://github.com/Panl99/demo/tree/master/demo-client/src/main/java/com/outman/democlient/util/ConcurrentHashSet.java)
    
 ------
 # 剑指Offer
