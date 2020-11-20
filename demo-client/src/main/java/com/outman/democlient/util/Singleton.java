@@ -1,4 +1,4 @@
-package com.outman.democlient.leetcode;
+package com.outman.democlient.util;
 
 /**
  * @create 2020/9/17 21:27
