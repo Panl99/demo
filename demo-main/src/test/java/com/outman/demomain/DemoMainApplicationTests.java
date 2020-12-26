@@ -1,10 +1,10 @@
-package com.outman.democlient;
+package com.outman.demomain;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DemoClientApplicationTests {
+class DemoMainApplicationTests {
 
     @Test
     void contextLoads() {

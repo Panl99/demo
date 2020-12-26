@@ -14,7 +14,7 @@ logging:
     root: DEBUG
 ---
 spring:
-  profiles: prod
+  profiles: test
 
 logging:
   path: /tmp/

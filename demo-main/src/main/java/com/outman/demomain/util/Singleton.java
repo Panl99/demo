@@ -1,4 +1,4 @@
-package com.outman.democlient.util;
+package com.outman.demomain.util;
 
 /**
  * @create 2020/9/17 21:27
