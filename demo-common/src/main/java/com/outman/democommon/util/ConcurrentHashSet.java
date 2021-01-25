@@ -1,4 +1,4 @@
-package com.outman.demomain.util;
+package com.outman.democommon.util;
 
 import java.util.Collection;
 import java.util.Iterator;

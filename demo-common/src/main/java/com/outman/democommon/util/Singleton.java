@@ -1,4 +1,4 @@
-package com.outman.demomain.util;
+package com.outman.democommon.util;
 
 /**
  * @create 2020/9/17 21:27

@@ -9,10 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.outman</groupId>
-    <artifactId>demo-main</artifactId>
+    <artifactId>demo-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo-main</name>
-    <description>Demo project for Spring Boot</description>
+    <name>demo-common</name>
+    <packaging>jar</packaging>
+    <description>demo-common project for demo</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -22,10 +23,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
@@ -40,17 +37,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!--<configuration>
-                    <mainClass>com.outman.demomain.DemoMainApplication</mainClass>&lt;!&ndash;指定全局唯一入口&ndash;&gt;
-                    <layout>zip</layout>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>&lt;!&ndash;把依赖的包都打包到生成的jar中&ndash;&gt;
-                        </goals>
-                    </execution>
-                </executions>-->
             </plugin>
         </plugins>
     </build>
