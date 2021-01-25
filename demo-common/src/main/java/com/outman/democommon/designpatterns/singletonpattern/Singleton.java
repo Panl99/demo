@@ -1,4 +1,4 @@
-package com.outman.democommon.util;
+package com.outman.democommon.designpatterns.singletonpattern;
 
 /**
  * @create 2020/9/17 21:27

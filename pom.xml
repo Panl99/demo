@@ -18,6 +18,7 @@
 
     <modules>
         <module>demo-main</module>
+        <module>demo-common</module>
         <module>demo-config</module>
         <module>demo-register</module>
     </modules>
