@@ -32,6 +32,9 @@
         <spring.boot.version>2.4.1</spring.boot.version>
         <!--spring-cloud-version-->
         <spring.cloud.version>2020.0.0</spring.cloud.version>
+
+        <commons-lang3.version>3.10</commons-lang3.version>
+        <guava.version>30.1-jre</guava.version>
     </properties>
     <!--依赖spring-cloud最新版本，保持各组件间兼容-->
     <dependencyManagement>
@@ -49,6 +52,17 @@
                 <version>${spring.cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
