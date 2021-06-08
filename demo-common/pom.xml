@@ -8,6 +8,7 @@
         <version>0.0.1-SNAPSHOT</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>com.outman</groupId>
     <artifactId>demo-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -25,13 +26,25 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
         </dependency>
 
         <dependency>
