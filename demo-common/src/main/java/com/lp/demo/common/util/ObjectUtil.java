@@ -1,14 +1,19 @@
 package com.lp.demo.common.util;
 
 
+import com.lp.demo.common.dto.UserDto;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author lp
@@ -109,7 +114,7 @@ public class ObjectUtil {
 
     /**
      * 获取全部字段名
-     * @param obj
+     * @param obj 类对象
      * @return
      */
     public static String[] getAllFieldName(Object obj) {
@@ -117,10 +122,55 @@ public class ObjectUtil {
         return Arrays.stream(fields).map(Field::getName).toArray(String[]::new);
     }
 
+    /**
+     * 根据字段名获取值
+     * @param obj 类对象
+     * @param fieldName 字段名
+     * @return
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
     public static Object getFieldValueByName(Object obj, String fieldName) throws NoSuchFieldException, IllegalAccessException {
         Field field = obj.getClass().getDeclaredField(fieldName);
+        return getFieldValueByName(obj, field);
+    }
+
+    private static Object getFieldValueByName(Object obj, Field field) throws IllegalAccessException {
         field.setAccessible(true);
         return field.get(obj);
+    }
+
+    /**
+     * 获取所有字段值
+     * @param obj 类对象
+     * @return
+     */
+    public static Map getAllFieldValueByName(Object obj) {
+        String[] allFieldName = getAllFieldName(obj);
+        Map<String, Object> fieldMap = new HashMap<>(allFieldName.length);
+        List<String> allFields = new ArrayList<>(Arrays.asList(allFieldName));
+        allFields.stream().forEach(field -> {
+            Object fieldVal = "";
+            try {
+                fieldVal = getFieldValueByName(obj, field);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+            fieldMap.put(field, fieldVal);
+        });
+        return fieldMap;
+    }
+
+    public static void main(String[] args) {
+        UserDto user = UserDto.initUserDto();
+
+        // 获取全部字段名
+        System.out.println(Arrays.stream(getAllFieldName(user)).collect(Collectors.toList()));
+
+        // 获取全部字段值
+        Map allFieldValue = getAllFieldValueByName(user);
+        System.out.println(allFieldValue);
     }
 
 }

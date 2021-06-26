@@ -23,7 +23,7 @@ public class JsonUtil {
     public static void main(String[] args) {
         String jsonStr = "{\"b\":\"value2\",\"c\":\"value3\",\"a\":\"value1\"}";
 
-        UserDto user = initUserDto();
+        UserDto user = UserDto.initUserDto();
 
         JSONObject jsonObject = createJsonObj();
 
@@ -71,27 +71,6 @@ public class JsonUtil {
                 .set("s2", "value-b")
                 .set("s3", "value-c");
         return json;
-    }
-
-    private static UserDto initUserDto() {
-        UserDto userDto = new UserDto();
-        userDto.setName("zhangsan");
-        userDto.setAge(18);
-        userDto.setAddress("广东");
-        userDto.setDate(new Date());
-        List<String> hobby = new ArrayList<>();
-        hobby.add("篮球");
-        hobby.add("羽毛球");
-        hobby.add("爬山");
-        userDto.setHobby(hobby);
-        userDto.setPhoneNumber(123456789);
-        Map<String, String> school = new HashMap<>();
-        school.put("小学", "庞各庄一小");
-        school.put("中学", "庞各庄一中");
-        school.put("大学", "庞各庄大一");
-        userDto.setSchool(school);
-
-        return userDto;
     }
 
 
