@@ -23,6 +23,12 @@
 
 ## demo-register
 
+## demo-brcc
+百度开源配置中心。
+
+- [brcc.github](https://github.com/baidu/brcc)
+- [brcc.md](https://github.com/Panl99/codebook/blob/master/configcenter/brcc.md)
+
 [目录](#目录)
 
 # 技术选型
