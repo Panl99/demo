@@ -2,8 +2,6 @@
 - [demo简介](#demo)
     - [demo-main](#demo-main)
     - [demo-common](#demo-common)
-    - [demo-config](#demo-config)
-    - [demo-register](#demo-register)
 - [技术选型](#技术选型)
 - [端口规划](#端口规划)
 - [开发工具](#开发工具)
@@ -18,10 +16,6 @@
 ## demo-main
 
 ## demo-common
-
-## demo-config
-
-## demo-register
 
 ## demo-brcc
 百度开源配置中心。

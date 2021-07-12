@@ -1,8 +1,8 @@
 spring:
   application:
-    name: democonfig
+    name: demo
   profiles:
-    active: default
-  cloud:
-    config:
-      uri: http://localhost:8888
+    active: dev,rcc
+#  cloud:
+#    config:
+#      uri: http://localhost:8888

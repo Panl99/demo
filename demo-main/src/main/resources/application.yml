@@ -1,6 +1,8 @@
 spring:
-  profiles:
-    active: dev
+#  profiles:
+#    active: dev,rcc
+  application:
+    name: demo-main
 #  config:
 #    activate:
 #      on-profile: dev
@@ -11,6 +13,12 @@ spring:
 #    password: root
 #    driver-class-name: com.mysql.jdbc.Driver
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true #将ip注册到Eureka Server
 logging:
   level:
     root: INFO
