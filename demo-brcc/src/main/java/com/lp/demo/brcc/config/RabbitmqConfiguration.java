@@ -1,13 +1,8 @@
 package com.lp.demo.brcc.config;
 
-import com.baidu.brcc.ConfigItemChangedCallable;
-import com.lp.demo.brcc.handler.RabbitmqConfigItemChangedCallable;
-import com.lp.demo.common.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 
 /**
  * @author lp
@@ -37,13 +32,13 @@ public class RabbitmqConfiguration {
     private String queue;
 
 
-    @PostConstruct
-    public void init() {
-        System.out.println("load rabbitmq properties from rcc, the value is " + ObjectUtil.getAllFieldValueByName(RabbitmqConfiguration.class));
-    }
+//    @PostConstruct
+//    public void init() {
+//        System.out.println("load rabbitmq properties from rcc, the value is " + ObjectUtil.getAllFieldValueByName(RabbitmqConfiguration.class));
+//    }
 
-    @Bean
-    public ConfigItemChangedCallable configItemChangedCallable() {
-        return new RabbitmqConfigItemChangedCallable();
-    }
+//    @Bean
+//    public ConfigItemChangedCallable configItemChangedCallable() {
+//        return new RabbitmqConfigItemChangedCallable();
+//    }
 }

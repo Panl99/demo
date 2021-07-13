@@ -85,6 +85,32 @@
 <!--            </dependency>-->
 
             <dependency>
+                <groupId>com.lp.demo</groupId>
+                <artifactId>demo-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lp.demo</groupId>
+                <artifactId>demo-netty</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lp.demo</groupId>
+                <artifactId>demo-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lp.demo</groupId>
+                <artifactId>demo-rabbitmq</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lp.demo</groupId>
+                <artifactId>demo-brcc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
