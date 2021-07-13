@@ -6,7 +6,6 @@
         <groupId>com.lp.demo</groupId>
         <artifactId>demo-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.lp.demo</groupId>

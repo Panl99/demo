@@ -33,6 +33,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <skipTests>true</skipTests>
+        <docker.host>http://192.168.188.100:2375</docker.host>
+        <docker.maven.plugin.version>1.2.2</docker.maven.plugin.version>
         <!--spring-boot-version-->
 <!--        <spring-boot.version>2.4.2</spring-boot.version>-->
         <!--spring-cloud-version-->
@@ -148,6 +150,14 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
@@ -205,12 +215,69 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${docker.maven.plugin.version}</version>
+
+                    <configuration>
+                        <imageName>demo/${project.artifactId}:${project.version}</imageName>
+                        <dockerHost>${docker.host}</dockerHost>
+                        <baseImage>java:8</baseImage>
+                        <entryPoint>["java", "-jar", "-Dspring.profiles.active=prod","/${project.build.finalName}.jar"]</entryPoint>
+<!--                        <dockerDirectory>${basedir}/</dockerDirectory> &lt;!&ndash; 使用 Dockerfile 构建:指定 Dockerfile 路径&ndash;&gt;-->
+                        <!-- 复制 jar 包到 docker 容器指定目录配置 -->
+                        <resources>
+                            <resource>
+                                <targetPath>/</targetPath>
+                                <directory>${project.build.directory}</directory>
+                                <include>${project.build.finalName}.jar</include>
+                            </resource>
+                        </resources>
+                    </configuration>
+                    <!--绑定Docker命令到Maven各个阶段-->
+                    <!--把Docker分为build、tag、push，然后分别绑定Maven的package、deploy阶段，只需要执行mvn deploy就可以完成整个build、tag、push操作，执行mvn build就只完成build、tag操作-->
+                    <!-- -DskipDockerBuild 跳过build镜像,-DskipDockerTag 跳过tag镜像,-DskipDockerPush 跳过push镜像,-DskipDocker 跳过整个阶段-->
+                    <executions>
+                        <execution>
+                            <id>build-image</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>tag-image</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>tag</goal>
+                            </goals>
+                            <configuration>
+                                <image>mavendemo:latest</image>
+                                <newName>demo/${project.artifactId}:${project.version}</newName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>push-image</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>push</goal>
+                            </goals>
+                            <configuration>
+                                <imageName>demo/${project.artifactId}:${project.version}</imageName>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -218,6 +285,7 @@
                     <include>**/*.yml</include>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
+                    <include>**/*.sh</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
@@ -227,6 +295,7 @@
                     <include>**/*.yml</include>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
+                    <include>**/*.sh</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
