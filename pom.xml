@@ -51,7 +51,7 @@
         <redisson.version>3.15.2</redisson.version>
 
         <brcc-sdk.version>1.0.2</brcc-sdk.version>
-        <hutool-all.version>5.6.5</hutool-all.version>
+        <hutool-all.version>5.7.4</hutool-all.version>
     </properties>
     <!--依赖spring-cloud最新版本，保持各组件间兼容-->
     <dependencyManagement>
