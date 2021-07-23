@@ -1,9 +1,8 @@
 package com.lp.demo.common.result;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.lp.demo.common.dto.UserDto;
-import org.springframework.core.annotation.Order;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,6 +11,7 @@ import java.util.Date;
  * @author liupan
  * @date 2021/7/16 17:32
  **/
+@Data
 public class JsonResult<T> implements Serializable {
     private final long timestamp = System.currentTimeMillis();
     private int code = 2000;
@@ -34,34 +34,6 @@ public class JsonResult<T> implements Serializable {
         this.code = code;
         this.msg = msg;
         this.data = data;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
     }
 
 

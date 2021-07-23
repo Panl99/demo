@@ -1,13 +1,17 @@
 package com.lp.demo.common.util;
 
+import com.lp.demo.common.enums.ZoneIdEnum;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author lp
@@ -16,17 +20,20 @@ import java.util.Date;
  **/
 public class DateUtil {
     public static void main(String[] args) {
+        System.out.println("getDate() = " + getDate());
+        System.out.println("getDate(caymanZoneId) = " + getDate(ZoneIdEnum.EST.getZoneIdName()));
+        System.out.println("getTime() = " + getTime());
+        System.out.println("getTime(caymanZoneId) = " + getTime(ZoneIdEnum.EST.getZoneIdName()));
+        System.out.println("getDateTime() = " + getDateTime());
+        System.out.println("getDateTimeZone() = " + getDateTimeZone());
+        System.out.println("getDateTimeZone(caymanZoneId) = " + getDateTimeZone(ZoneIdEnum.EST.getZoneIdName()));
+        System.out.println("getDateTimeFormat() = " + getDateTimeFormat());
+        System.out.println("getSimpleDateFormat() = " + getSimpleDateFormat());
+        System.out.println("getDateInterval(2021, 5, 1) = " + getDateInterval(2021, 5, 1));
 
+        System.out.println("getZoneIds() = " + getZoneIds());
+        System.out.println("ZonedDateTimeTransform(14, 03, shanghaiZoneId, caymanZoneId) = " + ZonedDateTimeTransform(12, 03, ZoneIdEnum.CTT.getZoneIdName(), ZoneIdEnum.EST.getZoneIdName()));
 
-        System.out.println(getTime());
-        System.out.println(getDate());
-
-        System.out.println(getDateTime());
-        System.out.println(getDateTimeZone());
-        System.out.println(getDateTimeFormat());
-        System.out.println(getSimpleDateFormat());
-
-        System.out.println(getDateInterval(2021, 5, 1));
     }
 
     /**
@@ -36,6 +43,16 @@ public class DateUtil {
      */
     public static String getDate() {
         LocalDate today = LocalDate.now();
+        return today.toString();
+    }
+
+    /**
+     * 获取当前日期(指定时区)
+     *
+     * @return xxxx-xx-xx
+     */
+    public static String getDate(String zoneId) {
+        LocalDate today = LocalDate.now(ZoneId.of(zoneId));
         return today.toString();
     }
 
@@ -50,6 +67,16 @@ public class DateUtil {
     }
 
     /**
+     * 获取当前时间点(指定时区)
+     *
+     * @return xx:xx:xx.xxx
+     */
+    public static String getTime(String zoneId) {
+        LocalTime time = LocalTime.now(ZoneId.of(zoneId));
+        return time.toString();
+    }
+
+    /**
      * 获取当前时间戳（不带时区）
      *
      * @return xxxx-xx-xxTxx:xx:xx.xxx
@@ -60,12 +87,22 @@ public class DateUtil {
     }
 
     /**
-     * 获取当前时间戳（带时区）
+     * 获取当前时间戳（系统默认时区）
      * CTT - Asia/Shanghai
      * @return xxxx-xx-xxTxx:xx:xx.xxx
      */
     public static String getDateTimeZone() {
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        return now.toString();
+    }
+
+    /**
+     * 获取当前时间戳（指定时区）
+     *
+     * @return xxxx-xx-xxTxx:xx:xx.xxx
+     */
+    public static String getDateTimeZone(String zoneId) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(zoneId));
         return now.toString();
     }
 
@@ -108,7 +145,24 @@ public class DateUtil {
      */
 
     /**
-     * 时区
+     * 获取时区
      */
+    public static Set<String> getZoneIds() {
+        return ZoneId.getAvailableZoneIds();
+    }
+
+    /**
+     * 时区时间转换
+     * @param hour 指定小时
+     * @param minute 指定分钟
+     * @param sourceZoneId 源分区
+     * @param targetZoneId 目标分区
+     * @return xxxx-xx-xx xx:xx:xx
+     */
+    public static String ZonedDateTimeTransform(int hour, int minute, String sourceZoneId, String targetZoneId) {
+        ZonedDateTime sourceZoneDateTime = ZonedDateTime.of(LocalDate.now(ZoneId.of(sourceZoneId)), LocalTime.of(hour, minute), ZoneId.of(sourceZoneId));
+        ZonedDateTime targetZoneDateTime = sourceZoneDateTime.withZoneSameInstant(ZoneId.of(targetZoneId));
+        return targetZoneDateTime.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
 
 }
