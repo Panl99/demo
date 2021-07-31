@@ -18,6 +18,10 @@ public class JsonResult<T> implements Serializable {
     private String msg;
     private T data;
 
+    public final static JsonResult SUCCESS = new JsonResult(0, "Success");
+    public final static JsonResult FAIL = new JsonResult(1, "Fail");
+    public final static JsonResult TIMEOUT = new JsonResult(2, "Timeout");
+
     public JsonResult() {
     }
 
