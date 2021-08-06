@@ -53,6 +53,7 @@
 
         <brcc-sdk.version>1.0.2</brcc-sdk.version>
         <hutool-all.version>5.7.4</hutool-all.version>
+        <fastjson.version>1.2.76</fastjson.version>
     </properties>
     <!--依赖spring-cloud最新版本，保持各组件间兼容-->
     <dependencyManagement>
@@ -157,6 +158,12 @@
                 <version>${hutool-all.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -172,6 +179,10 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
 
 
