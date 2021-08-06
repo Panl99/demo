@@ -29,6 +29,15 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         Method deviceEventServiceMethod = eventServiceContext.getDeviceEventServiceMethod(eventInfo.getBusinessType().concat(".").concat(eventInfo.getEventType()));
         Class deviceEventServiceClazz = eventServiceContext.getDeviceEventServiceClazz(eventInfo.getBusinessType());
 //        DeviceEventService deviceEventService = eventServiceContext.getDeviceEventService(eventInfo.getBusinessType());
+
+        if (deviceEventServiceClazz == null) {
+            return "cannot find clazz, clazz.annotation = ".concat(eventInfo.getBusinessType());
+        }
+
+        if (deviceEventServiceMethod == null) {
+            return "cannot find method, method.annotation = ".concat(eventInfo.getEventType());
+        }
+
         try {
             result = (String) deviceEventServiceMethod.invoke(deviceEventServiceClazz.newInstance(), eventInfo);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
