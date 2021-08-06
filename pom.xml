@@ -26,6 +26,7 @@
         <module>demo-brcc</module>
         <module>demo-dubbo</module>
         <module>demo-nacos</module>
+        <module>demo-iot</module>
     </modules>
 
     <properties>
