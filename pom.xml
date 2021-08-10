@@ -27,6 +27,9 @@
         <module>demo-dubbo</module>
         <module>demo-nacos</module>
         <module>demo-iot</module>
+        <module>demo-seata</module>
+        <module>demo-sentinel</module>
+        <module>demo-jwt</module>
     </modules>
 
     <properties>

@@ -16,12 +16,53 @@
 ## demo-main
 
 ## demo-common
+- [工具类demo](demo-common/src/main/java/com/lp/demo/common/util)
+- [设计模式demo](demo-common/src/main/java/com/lp/demo/common/designpatterns)
+- [源码实战demo](demo-common/src/main/java/com/lp/demo/common/codeinaction)
+- [文件解析demo TODO](demo-common/src/main/java/com/lp/demo/common/parsefile)
+
+## demo-redis
+
+## demo-netty
+
+## demo-websocket
+
+## demo-eureka
+
+## demo-kafka
+
+## demo-rabbitmq
+
 
 ## demo-brcc
 百度开源配置中心。
 
 - [brcc.github](https://github.com/baidu/brcc)
 - [brcc.md](https://github.com/Panl99/codebook/blob/master/configcenter/brcc.md)
+
+## demo-dubbo
+阿里-Apache开源RPC框架
+
+## demo-nacos
+阿里开源注册中心、配置中心
+
+## demo-iot
+iot相关
+
+- [设备事件服务](demo-iot/src/main/java/com/lp/demo/iot/service/DeviceEventService.java)
+  - 策略模式，按业务类型、事件类型分发给具体Handler处理。
+
+## demo-seata
+阿里开源的分布式事务组件。
+
+- [官方文档](https://seata.io/zh-cn/docs/overview/what-is-seata.html)
+
+
+## demo-sentinel
+阿里开源的分布式流控组件
+
+## demo-jwt
+
 
 [目录](#目录)
 
