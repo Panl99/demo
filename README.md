@@ -61,6 +61,8 @@ iot相关
 ## demo-sentinel
 阿里开源的分布式流控组件
 
+- [github wiki](https://github.com/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D)
+
 ## demo-jwt
 
 
