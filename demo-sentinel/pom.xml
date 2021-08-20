@@ -8,13 +8,15 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.lp.demo</groupId>
     <artifactId>demo-sentinel</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>demo-sentinel</name>
-    <description>Demo project for Spring Boot</description>
+    <packaging>pom</packaging>
+
     <properties>
         <java.version>1.8</java.version>
+<!--        <sentinel.version>2.2.6.RELEASE</sentinel.version>-->
+        <sentinel-dubbo.version>1.8.2</sentinel-dubbo.version>
     </properties>
     <dependencies>
         <dependency>
@@ -25,12 +27,27 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+<!--            <version>${sentinel.version}</version>-->
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-apache-dubbo-adapter</artifactId>
+            <version>${sentinel-dubbo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-dubbo</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lp.demo</groupId>
+            <artifactId>demo-common</artifactId>
         </dependency>
     </dependencies>
 
