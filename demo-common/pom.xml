@@ -18,6 +18,7 @@
     <properties>
         <java.version>1.8</java.version>
         <poi.version>4.1.2</poi.version>
+        <easyexcel.version>2.2.10</easyexcel.version>
     </properties>
 
     <dependencies>
@@ -84,6 +85,18 @@
             <version>3.1.0</version>
         </dependency>
         <!--excel依赖 end-->
+        <!--easyexcel-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>${easyexcel.version}</version>
+        </dependency>
+        <!--打印当前进程的内存使用状态-->
+        <dependency>
+            <groupId>com.jerolba</groupId>
+            <artifactId>jmnemohistosyne</artifactId>
+            <version>0.2.3</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
