@@ -40,6 +40,17 @@ public class JsonResult<T> implements Serializable {
         this.data = data;
     }
 
+    public JsonResult(ResultEnum result) {
+        this.code = result.getCode();
+        this.msg = result.getMsg();
+    }
+
+    public JsonResult(ResultEnum result, T data) {
+        this.code = result.getCode();
+        this.msg = result.getMsg();
+        this.data = data;
+    }
+
 
     public static void main(String[] args) {
         JsonResult<UserDto> result1 = new JsonResult<>();
