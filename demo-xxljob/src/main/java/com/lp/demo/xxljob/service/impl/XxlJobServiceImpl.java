@@ -29,22 +29,22 @@ public class XxlJobServiceImpl implements XxlJobService {
         String response = HttpUtil.createPost(xxlJobAdminHost + JOB_INFO_URL + "add")
                 .form("jobGroup", 2)
                 .form("jobDesc", describe)
-                .form("author", "")
+                .form("author", "lp")
                 .form("scheduleType", "CRON")
                 .form("scheduleConf", cron)
                 .form("cronGen_display", cron)
                 .form("glueType", "BEAN")
                 .form("executorHandler", jobHandler)
                 .form("executorParam", param)
-                .form("executorRouteStrategy", "ROUND")
+                .form("executorRouteStrategy", "ROUND") // 轮询
                 .form("misfireStrategy", "DO_NOTHING")
                 .form("executorBlockStrategy", "SERIAL_EXECUTION")
                 .form("executorTimeout", 0)
                 .form("executorFailRetryCount", 0)
-                .execute().body();
+                .execute()
+                .body();
         JSONObject jsonObject = JSONObject.parseObject(response);
-        Integer code = jsonObject.getInteger("code");
-        if (ResultEnum.SUCCESS.getCode() != code) {
+        if (jsonObject == null || ResultEnum.SUCCESS.getCode() != jsonObject.getInteger("code")) {
             throw new DisplayableException(500,"添加任务失败");
         }
         long jobId = Long.parseLong(jsonObject.getString("content"));
@@ -59,8 +59,7 @@ public class XxlJobServiceImpl implements XxlJobService {
                 .form("id", id)
                 .execute().body();
         JSONObject jsonObject = JSONObject.parseObject(response);
-        Integer code = jsonObject.getInteger("code");
-        if (ResultEnum.SUCCESS.getCode() != code) {
+        if (jsonObject == null || ResultEnum.SUCCESS.getCode() != jsonObject.getInteger("code")) {
             throw new DisplayableException(500, "删除任务失败");
         }
     }
@@ -85,8 +84,7 @@ public class XxlJobServiceImpl implements XxlJobService {
                 .form("executorFailRetryCount", 0)
                 .execute().body();
         JSONObject jsonObject = JSONObject.parseObject(response);
-        Integer code = jsonObject.getInteger("code");
-        if (ResultEnum.SUCCESS.getCode() != code) {
+        if (jsonObject == null || ResultEnum.SUCCESS.getCode() != jsonObject.getInteger("code")) {
             throw new DisplayableException(500, "修改任务失败");
         }
     }

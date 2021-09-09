@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @author lp
  * @date 2021/9/8 15:49
  *
- * 待验证 不好使
+ * 登录接口可以通
+ * 其他接口不通，可能找不到服务，需配置注册中心
  *
  **/
 @RestController
@@ -29,7 +30,7 @@ public class XxlJobController {
     @Autowired
     XxlJobService jobService;
 
-    @PostMapping("add")
+    @PostMapping(value = {"add", "insert"}, produces = {"application/json;charset=UTF-8"})
     public JsonResult<Long> addJob(@RequestBody JobInfo jobInfo) {
         long jobId = jobService.addJob(jobInfo.getJobDesc(), jobInfo.getScheduleConf(), jobInfo.getExecutorHandler(), jobInfo.getExecutorParam());
         return new JsonResult<>(ResultEnum.SUCCESS, jobId);
@@ -41,7 +42,7 @@ public class XxlJobController {
         return new JsonResult<>(ResultEnum.SUCCESS);
     }
 
-    @PutMapping("update")
+    @PutMapping({"update", "refresh"})
     public JsonResult updateJob(@RequestBody JobInfo jobInfo) {
         jobService.updateJob((long) jobInfo.getId(), jobInfo.getJobDesc(), jobInfo.getScheduleConf(), jobInfo.getExecutorHandler(), jobInfo.getExecutorParam());
         return new JsonResult<>(ResultEnum.SUCCESS);
