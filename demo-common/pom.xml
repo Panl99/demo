@@ -17,6 +17,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <swagger.version>1.5.20</swagger.version>
         <poi.version>4.1.2</poi.version>
         <easyexcel.version>2.2.10</easyexcel.version>
     </properties>
@@ -47,6 +48,18 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>6.6</version>
+        </dependency>
+
 
         <!--excel依赖-->
         <dependency>

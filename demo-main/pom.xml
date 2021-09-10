@@ -25,42 +25,22 @@
             <groupId>com.lp.demo</groupId>
             <artifactId>demo-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.lp.demo</groupId>
-            <artifactId>demo-netty</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lp.demo</groupId>
-            <artifactId>demo-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lp.demo</groupId>
-            <artifactId>demo-rabbitmq</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lp.demo</groupId>
-            <artifactId>demo-brcc</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.lp.demo</groupId>-->
+<!--            <artifactId>demo-netty</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.lp.demo</groupId>-->
+<!--            <artifactId>demo-redis</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.lp.demo</groupId>-->
+<!--            <artifactId>demo-rabbitmq</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.lp.demo</groupId>-->
+<!--            <artifactId>demo-brcc</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <!--<configuration>
-                    <mainClass>com.outman.demomain.DemoMainApplication</mainClass>&lt;!&ndash;指定全局唯一入口&ndash;&gt;
-                    <layout>zip</layout>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>&lt;!&ndash;把依赖的包都打包到生成的jar中&ndash;&gt;
-                        </goals>
-                    </execution>
-                </executions>-->
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
