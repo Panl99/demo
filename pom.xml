@@ -30,6 +30,7 @@
         <module>demo-seata</module>
         <module>demo-sentinel</module>
         <module>demo-jwt</module>
+        <module>demo-xxljob</module>
     </modules>
 
     <properties>

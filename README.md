@@ -1,7 +1,21 @@
 # 目录
 - [demo简介](#demo)
-    - [demo-main](#demo-main)
-    - [demo-common](#demo-common)
+  - [demo-main](#demo-main)
+  - [demo-common](#demo-common)
+  - [demo-redis](#demo-redis)
+  - [demo-netty](#demo-netty)
+  - [demo-websocket](#demo-websocket)
+  - [demo-eureka](#demo-eureka)
+  - [demo-kafka](#demo-kafka)
+  - [demo-rabbitmq](#demo-rabbitmq)
+  - [demo-brcc](#demo-brcc)
+  - [demo-dubbo](#demo-dubbo)
+  - [demo-nacos](#demo-nacos)
+  - [demo-iot](#demo-iot)
+  - [demo-seata](#demo-seata)
+  - [demo-sentinel](#demo-sentinel)
+  - [demo-jwt](#demo-jwt)
+  - [demo-xxljob](#demo-xxljob)  
 - [技术选型](#技术选型)
 - [端口规划](#端口规划)
 - [开发工具](#开发工具)
@@ -14,12 +28,43 @@
 常用技术用法实践。
 
 ## demo-main
+- [MainController](demo-main/src/main/java/com/lp/demo/main/controller/MainController.java)
+  - 简单rest接口测试
+- [UserController](demo-main/src/main/java/com/lp/demo/main/controller/UserController.java)
+  - [aop测试](demo-common/src/main/java/com/lp/demo/common/aop)
 
 ## demo-common
 - [工具类demo](demo-common/src/main/java/com/lp/demo/common/util)
+  - [hutool](demo-common/src/main/java/com/lp/demo/common/util/hutool)：hutool工具类测试
+    - [ExcelUtilDemo](demo-common/src/main/java/com/lp/demo/common/util/hutool/ExcelUtilDemo.java)：Excel工具使用示例
+    - [JsonUtilDemo](demo-common/src/main/java/com/lp/demo/common/util/hutool/JsonUtilDemo.java)：Json工具使用示例
+    - [StrUtilDemo null](demo-common/src/main/java/com/lp/demo/common/util/hutool/StrUtilDemo.java)：字符串工具使用示例
+  - [BloomFilterUtil](demo-common/src/main/java/com/lp/demo/common/util/BloomFilterUtil.java)：布隆过滤器示例
+  - [ConcurrentHashSet](demo-common/src/main/java/com/lp/demo/common/util/ConcurrentHashSet.java)：ConcurrentHashSet实现
+  - [ConsoleColorUtil](demo-common/src/main/java/com/lp/demo/common/util/ConsoleColorUtil.java)：System.out.println打印自定义文本颜色、状态
+  - [DateUtil](demo-common/src/main/java/com/lp/demo/common/util/DateUtil.java)：日期时间工具示例
+  - [JsonUtil](demo-common/src/main/java/com/lp/demo/common/util/JsonUtil.java)：Json工具示例
+  - [ObjectUtil](demo-common/src/main/java/com/lp/demo/common/util/ObjectUtil.java)：对象工具类（对象校验、Bean转换）
+  - [RandomUtil](demo-common/src/main/java/com/lp/demo/common/util/RandomUtil.java)：随机数工具（安全随机数）
+  - [StringUtil](demo-common/src/main/java/com/lp/demo/common/util/StringUtil.java)：字符串工具（字符串校验）
+  - [SystemStatusInfoStatisticsUtil](demo-common/src/main/java/com/lp/demo/common/util/SystemStatusInfoStatisticsUtil.java)：系统状态统计（cpu、堆栈、内存等使用率）
 - [设计模式demo](demo-common/src/main/java/com/lp/demo/common/designpatterns)
 - [源码实战demo](demo-common/src/main/java/com/lp/demo/common/codeinaction)
 - [文件解析demo TODO](demo-common/src/main/java/com/lp/demo/common/parsefile)
+
+- [aop](demo-common/src/main/java/com/lp/demo/common/aop)：aop定义
+- [async](demo-common/src/main/java/com/lp/demo/common/async)：@Async异步任务定义、测试
+- [enums](demo-common/src/main/java/com/lp/demo/common/enums)：枚举目录
+  - [ZoneIdEnum](demo-common/src/main/java/com/lp/demo/common/enums/ZoneIdEnum.java)：时区枚举定义
+- [exception](demo-common/src/main/java/com/lp/demo/common/exception)：异常目录
+  - [DisplayableException](demo-common/src/main/java/com/lp/demo/common/exception/DisplayableException.java)：自定义异常
+- [result](demo-common/src/main/java/com/lp/demo/common/result)：result目录
+  - [JsonResult](demo-common/src/main/java/com/lp/demo/common/result/JsonResult.java)：返回结果定义
+  - [ResultEnum](demo-common/src/main/java/com/lp/demo/common/result/ResultEnum.java)：返回结果枚举值定义
+- [service](demo-common/src/main/java/com/lp/demo/common/service)：service目录
+  - [ThreadMetricService](demo-common/src/main/java/com/lp/demo/common/service/ThreadMetricService.java)：线程统计服务
+- [test](demo-common/src/main/java/com/lp/demo/common/test)：测试目录
+  - [ThreadLocalTest](demo-common/src/main/java/com/lp/demo/common/test/ThreadLocalTest.java)：ThreadLocal简单测试
 
 ## demo-redis
 
@@ -65,6 +110,8 @@ iot相关
 
 ## demo-jwt
 
+
+## demo-xxljob
 
 [目录](#目录)
 
