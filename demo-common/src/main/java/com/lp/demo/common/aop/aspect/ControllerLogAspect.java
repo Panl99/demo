@@ -1,4 +1,4 @@
-package com.lp.demo.common.log;
+package com.lp.demo.common.aop.aspect;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;

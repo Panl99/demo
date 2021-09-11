@@ -29,9 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * 使用@SaveLog添加日志
  */
-
 @Slf4j
 @Aspect
 @Component
@@ -60,8 +59,8 @@ public class WebLogAspect {
         // 掩码 saveLog
         Map<Integer, Set<String>> masks = maskMap(saveLog.masks());
         // 获取操作用户
-        Object obj = new ThreadLocal<>().get();
-        ConsoleColorUtil.printDefaultColor(String.valueOf(obj));
+//        Object obj = new ThreadLocal<>().get();
+//        ConsoleColorUtil.printDefaultColor(String.valueOf(obj));
         Long userId = 0L;
         String operator = "lp";
 
