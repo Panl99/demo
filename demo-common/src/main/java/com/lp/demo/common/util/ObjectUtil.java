@@ -1,6 +1,10 @@
 package com.lp.demo.common.util;
 
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
+import com.lp.demo.common.dto.User;
 import com.lp.demo.common.dto.UserDto;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
@@ -16,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -260,6 +265,78 @@ public class ObjectUtil {
         List<Object> resultList = distinctObjAbstract(userList, "name","age","hobby");
         System.out.println(resultList);
 
+    }
+
+    /**
+     * 泛型Test
+     * @param data 不同类型的List
+     * @param type 具体类型
+     * @param action
+     * @param clientId
+     * @param <T>
+     */
+    public <T extends List<T>> void pushMessage(List<T> data, Class<T> type, String action, String clientId) {
+        if (CollectionUtil.isNotEmpty(data)) {
+            String msg = JSON.toJSONString(getMsg(data, action));
+            for (T t : data) {
+                T obj = toObject(t, type);
+                Object placeId = ObjectUtil.getFieldValueByName(obj, "placeId");
+                ConsoleColorUtil.printDefaultColor(clientId + msg + placeId);
+            }
+        }
+    }
+
+    public static <T extends List<T>> T toObject(T data, Class<T> type) {
+        if (CollectionUtil.isEmpty(data)) {
+            return null;
+        }
+        T t = null;
+        try {
+            t = JSONUtil.toBean(data.toString(), type);
+        } catch (Exception e) {
+            ConsoleColorUtil.printDefaultColor("to object fail."+ e);
+        }
+        return t;
+    }
+
+    /**
+     * 判断 object instanceof List<MyType> 的方式
+     * https://stackoverflow.com/questions/10108122/how-to-instanceof-listmytype
+     *
+     * 1. if (object instanceof List && ((List) object).stream().noneMatch((o -> !(o instanceof MyType)))) {}
+     * 检查全部列表项而不是取第一个检查：防止列表类型是List<Object>
+     */
+    private UserDto getMsg(Object o, String action) {
+        User user = new User();
+        if (o instanceof List && ((List) o).stream().allMatch((obj -> (obj instanceof User)))) {
+            user.setId(10001);
+            user.setName("10001");
+            user.setPhoneNumber(100010001);
+        }
+        List<String> list = new ArrayList<>();
+        list.add(user.toString());
+
+        UserDto appMsg = new UserDto();
+        appMsg.setName(UUID.randomUUID().toString());
+        appMsg.setAddress(action);
+        appMsg.setHobby(list);
+        return appMsg;
+    }
+
+    /**
+     * 泛型在编译时会擦除数据类型
+     * 可以通过包装器来保存List所包含的类型
+     */
+    static class GenericList<T> extends ArrayList<T> {
+        private Class<T> genericType;
+
+        public GenericList(Class<T> c) {
+            this.genericType = c;
+        }
+
+        public Class<T> getGenericType() {
+            return genericType;
+        }
     }
 
 }
