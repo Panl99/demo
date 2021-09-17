@@ -2,6 +2,7 @@ package com.lp.demo.common.util;
 
 import com.lp.demo.common.enums.ZoneIdEnum;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
@@ -34,6 +36,8 @@ public class DateUtil {
         System.out.println("getZoneIds() = " + getZoneIds());
         System.out.println("ZonedDateTimeTransform(14, 03, shanghaiZoneId, caymanZoneId) = " + ZonedDateTimeTransform(12, 03, ZoneIdEnum.CTT.getZoneIdName(), ZoneIdEnum.EST.getZoneIdName()));
 
+        System.out.println("calculateTime()");
+        calculateTime("2021-09-15 18:10:36", -5);
     }
 
     /**
@@ -125,6 +129,25 @@ public class DateUtil {
      */
     public static String getSimpleDateFormat() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS").format(new Date());
+    }
+
+    public static void calculateTime(String date, int interval) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        try {
+            calendar.setTime(format.parse(date));
+        } catch (ParseException e) {
+            ConsoleColorUtil.printSingleColor(e.getMessage(), ConsoleColorUtil.ConsoleColorCodeEnum.RED.getColorCode(), ConsoleColorUtil.ConsoleStyleCodeEnum.UNDERSCORE.getStyleCode());
+            return;
+        }
+
+        ConsoleColorUtil.printDefaultColor(format.format(calendar.getTime()));
+
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + interval);
+        ConsoleColorUtil.printDefaultColor(format.format(calendar.getTime()));
+
+        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + interval);
+        ConsoleColorUtil.printDefaultColor(format.format(calendar.getTime()));
     }
 
     /**
