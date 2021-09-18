@@ -309,8 +309,8 @@ public class ObjectUtil {
     private UserDto getMsg(Object o, String action) {
         User user = new User();
         if (o instanceof List && ((List) o).stream().allMatch((obj -> (obj instanceof User)))) {
-            user.setId(10001);
-            user.setName("10001");
+            user.setUserId(10001);
+            user.setUserName("10001");
             user.setPhoneNumber(100010001);
         }
         List<String> list = new ArrayList<>();

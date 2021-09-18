@@ -8,7 +8,8 @@ import lombok.Data;
  **/
 @Data
 public class User {
-    int id;
-    String name;
+    Integer userId;
+    String userName;
     Integer phoneNumber;
+    Boolean isStudent;
 }

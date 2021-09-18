@@ -20,6 +20,9 @@
         <swagger.version>1.5.20</swagger.version>
         <poi.version>4.1.2</poi.version>
         <easyexcel.version>2.2.10</easyexcel.version>
+        <mapstruct.version>1.4.2.Final</mapstruct.version>
+        <projectlombok.version>1.18.20</projectlombok.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     </properties>
 
     <dependencies>
@@ -111,6 +114,24 @@
             <version>0.2.3</version>
         </dependency>
 
+        <!--mapstruct bean转换工具-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <!--也可使用-->
+<!--        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-jdk8</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -118,13 +139,45 @@
         </dependency>
     </dependencies>
 
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <!-- See https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html -->
+                        <!-- Classpath elements to supply as annotation processor path. If specified, the compiler   -->
+                        <!-- will detect annotation processors only in those classpath elements. If omitted, the     -->
+                        <!-- default classpath is used to detect annotation processors. The detection itself depends -->
+                        <!-- on the configuration of annotationProcessors.                                           -->
+                        <!--                                                                                         -->
+                        <!-- According to this documentation, the provided dependency processor is not considered!   -->
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                            <!--lombok版本大于1.18.16时需要添加以下依赖 (https://mapstruct.org/documentation/stable/reference/html/#lombok)-->
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${projectlombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>${lombok-mapstruct-binding.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
