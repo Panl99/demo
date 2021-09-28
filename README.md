@@ -58,7 +58,8 @@
 - [enums](demo-common/src/main/java/com/lp/demo/common/enums)：枚举目录
   - [ZoneIdEnum](demo-common/src/main/java/com/lp/demo/common/enums/ZoneIdEnum.java)：时区枚举定义
 - [exception](demo-common/src/main/java/com/lp/demo/common/exception)：异常目录
-  - [DisplayableException](demo-common/src/main/java/com/lp/demo/common/exception/DisplayableException.java)：自定义异常
+  - [DisplayableException](demo-common/src/main/java/com/lp/demo/common/exception/DisplayableException.java)：自定义抛异常
+  - [GlobalExceptionHandler](demo-common/src/main/java/com/lp/demo/common/exception/GlobalExceptionHandler.java)：全局异常处理
 - [result](demo-common/src/main/java/com/lp/demo/common/result)：result目录
   - [JsonResult](demo-common/src/main/java/com/lp/demo/common/result/JsonResult.java)：返回结果定义
   - [ResultEnum](demo-common/src/main/java/com/lp/demo/common/result/ResultEnum.java)：返回结果枚举值定义
