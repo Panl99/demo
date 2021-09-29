@@ -11,6 +11,8 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
@@ -38,6 +40,9 @@ public class DateUtil {
 
         System.out.println("calculateTime()");
         calculateTime("2021-09-15 18:10:36", -5);
+
+        // 时间单位测试
+        chronoUnitTest();
     }
 
     /**
@@ -164,10 +169,6 @@ public class DateUtil {
     }
 
     /**
-     * TemporalAdjusters用法 TODO
-     */
-
-    /**
      * 获取时区
      */
     public static Set<String> getZoneIds() {
@@ -188,4 +189,55 @@ public class DateUtil {
         return targetZoneDateTime.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
+
+    /**
+     * TemporalAdjusters用法 TODO
+     */
+
+
+    /**
+     * ChronoUnit：计时单位枚举
+     * @since 1.8
+     */
+    public static void chronoUnitTest() {
+        ConsoleColorUtil.printDefaultColor(">>>>>>>>>>>>>>>>>>>>>>>>>>>>chronoUnitTest<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        // 当前日期
+        LocalDate today = LocalDate.now();
+        ConsoleColorUtil.printDefaultColor("Current date: " + today);
+        // 1周后
+        LocalDate nextWeek = today.plus(1, ChronoUnit.WEEKS);
+        ConsoleColorUtil.printDefaultColor("Next week: " + nextWeek);
+        // 1月后
+        LocalDate nextMonth = today.plus(1, ChronoUnit.MONTHS);
+        ConsoleColorUtil.printDefaultColor("Next month: " + nextMonth);
+        // 1年后
+        LocalDate nextYear = today.plus(1, ChronoUnit.YEARS);
+        ConsoleColorUtil.printDefaultColor("Next year: " + nextYear);
+        // 10年后
+        LocalDate nextDecade = today.plus(1, ChronoUnit.DECADES);
+        ConsoleColorUtil.printDefaultColor("Date after ten year: " + nextDecade);
+
+        // 当前日期时间
+        LocalDateTime now = LocalDateTime.now();
+        ConsoleColorUtil.printDefaultColor("Current date time: " + now);
+        // 明天此时
+        LocalDateTime nextDay = now.plusDays(1);
+        ConsoleColorUtil.printDefaultColor("Next day: " + nextDay);
+        // 下周此时
+        LocalDateTime nextWeekTime = now.plusWeeks(1);
+        ConsoleColorUtil.printDefaultColor("This time next week: " + nextWeekTime);
+        // 5小时后
+        LocalDateTime fiveHoursLater = now.plusHours(5);
+        ConsoleColorUtil.printDefaultColor("5 hours later: " + fiveHoursLater);
+        // 30分钟后
+        LocalDateTime thirtyMinutesLater = now.plusMinutes(30);
+        ConsoleColorUtil.printDefaultColor("30 minutes later: " + thirtyMinutesLater);
+        // 30秒后
+        LocalDateTime thirtySecondsLater = now.plusSeconds(30);
+        ConsoleColorUtil.printDefaultColor("30 seconds later: " + thirtySecondsLater);
+        // 永远
+//        LocalDateTime forever = now.plus(3, ChronoUnit.FOREVER);
+//        ConsoleColorUtil.printDefaultColor("forever: " + forever);
+        ConsoleColorUtil.printDefaultColor("forever: " + ChronoUnit.FOREVER.getDuration());
+    }
 }
