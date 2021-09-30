@@ -8,6 +8,8 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.time.temporal.ChronoUnit;
+
 /**
  * @author lp
  * @date 2021/9/18 14:16
@@ -18,7 +20,8 @@ public interface CommonMapper {
     CommonMapper MAPPER = Mappers.getMapper(CommonMapper.class);
 
     @Mappings({
-            @Mapping(source = "name", target = "userName"),
+//            @Mapping(source = "name", target = "userName"),
+            @Mapping(target = "userName", expression = "java(concatName(userDto.getAge(), java.time.temporal.ChronoUnit.DAYS))"),
             @Mapping(source = "phoneNumber", target = "phoneNumber"),
             @Mapping(source = "age", target = "userId"),
             @Mapping(source = "name", target = "isStudent", qualifiedByName = "convertStatus")
@@ -31,5 +34,10 @@ public interface CommonMapper {
             return true;
         }
         return false;
+    }
+
+    @Named("concatName")
+    default String concatName(Integer value, ChronoUnit unit) {
+        return value + "#" + unit;
     }
 }
