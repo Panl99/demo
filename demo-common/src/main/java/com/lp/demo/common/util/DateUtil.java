@@ -43,6 +43,8 @@ public class DateUtil {
 
         // 时间单位测试
         chronoUnitTest();
+        // Date与LocalDateTime转换测试
+        dateToLocalDateTimeTest();
     }
 
     /**
@@ -239,5 +241,37 @@ public class DateUtil {
 //        LocalDateTime forever = now.plus(3, ChronoUnit.FOREVER);
 //        ConsoleColorUtil.printDefaultColor("forever: " + forever);
         ConsoleColorUtil.printDefaultColor("forever: " + ChronoUnit.FOREVER.getDuration());
+    }
+
+    public static void dateToLocalDateTimeTest() {
+        ConsoleColorUtil.printDefaultColor(">>>>>>>>>>>>>>>>>>>>>>>>>>>>dateToLocalDateTime<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        Date date = new Date();
+        ConsoleColorUtil.printDefaultColor("date: "+ date);
+
+        // Date转为LocalDateTime
+        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        ConsoleColorUtil.printDefaultColor("dateTime: "+ dateTime);
+
+        LocalDateTime plusDateTime = dateTime.plus(1, ChronoUnit.DAYS);
+        ConsoleColorUtil.printDefaultColor("plusDateTime: "+ plusDateTime);
+
+        // LocalDateTime转为Date
+        Date plusDate = Date.from(plusDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        ConsoleColorUtil.printDefaultColor("plusDate: "+ plusDate);
+
+        //
+        getExpireTime(date, 2, ChronoUnit.HOURS);
+    }
+
+
+    private static Date getExpireTime(Date date, Integer value, ChronoUnit unit) {
+        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        LocalDateTime dateTimePlus = dateTime.plus(value, unit);
+        ConsoleColorUtil.printDefaultColor("dateTimePlus = "+ dateTimePlus);
+
+        // LocalDateTime转为Date
+        Date datePlus = Date.from(dateTimePlus.atZone(ZoneId.systemDefault()).toInstant());
+        ConsoleColorUtil.printDefaultColor("datePlus = "+ datePlus);
+        return datePlus;
     }
 }
