@@ -1,5 +1,7 @@
 package com.lp.demo.iot.service.impl;
 
+import com.lp.demo.common.result.JsonResult;
+import com.lp.demo.common.result.ResultEnum;
 import com.lp.demo.iot.entity.EventInfo;
 import com.lp.demo.iot.listener.DeviceEventServiceContext;
 import com.lp.demo.iot.service.DeviceEventService;
@@ -23,27 +25,30 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     DeviceEventServiceContext eventServiceContext;
 
     @Override
-    public String execute(EventInfo eventInfo) {
+    public JsonResult execute(EventInfo eventInfo) {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>DeviceEventServiceImpl.execute----------");
-        String result = null;
-        Method deviceEventServiceMethod = eventServiceContext.getDeviceEventServiceMethod(eventInfo.getBusinessType().concat(".").concat(eventInfo.getEventType()));
-        Class deviceEventServiceClazz = eventServiceContext.getDeviceEventServiceClazz(eventInfo.getBusinessType());
+        String result;
+        Method deviceEventServiceMethod = eventServiceContext.getDeviceEventServiceMethod(eventInfo.getBusinessType()+(".")+(eventInfo.getEventType()));
+        Class deviceEventServiceClazz = eventServiceContext.getDeviceEventServiceClazz(eventInfo.getBusinessType().name());
 //        DeviceEventService deviceEventService = eventServiceContext.getDeviceEventService(eventInfo.getBusinessType());
 
         if (deviceEventServiceClazz == null) {
-            return "cannot find clazz, clazz.annotation = ".concat(eventInfo.getBusinessType());
+            log.error("cannot find business handler, businessClazz = {}", eventInfo.getBusinessType());
+            return new JsonResult<>(ResultEnum.FAIL, "cannot find business handler, businessClazz = "+ eventInfo.getBusinessType());
         }
 
         if (deviceEventServiceMethod == null) {
-            return "cannot find method, method.annotation = ".concat(eventInfo.getEventType());
+            log.error("cannot find event handling method, eventMethod = {}", eventInfo.getBusinessType() + "." + eventInfo.getEventType());
+            return new JsonResult<>(ResultEnum.FAIL, "cannot find event handling method, eventMethod = "+ eventInfo.getBusinessType() + "." + eventInfo.getEventType());
         }
 
         try {
             result = (String) deviceEventServiceMethod.invoke(deviceEventServiceClazz.newInstance(), eventInfo);
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             log.error("method invoke error, e = {}", e.getMessage());
+            return new JsonResult<>(ResultEnum.FAIL);
         }
 
-        return result;
+        return new JsonResult<>(ResultEnum.SUCCESS, result);
     }
 }

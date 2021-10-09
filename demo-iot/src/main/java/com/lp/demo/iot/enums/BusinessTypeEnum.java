@@ -6,23 +6,13 @@ package com.lp.demo.iot.enums;
  **/
 public enum BusinessTypeEnum {
     // 阿里业务
-    ALI("ali"),
+    ALI,
     // 百度业务
-    BAIDU("baidu"),
+    BAIDU,
     // 亚马逊业务
-    AWS("aws"),
+    AWS,
     // 谷歌业务
-    GOOGLE("google"),
+    GOOGLE,
     // 自动化（If This Then That）
-    IFTTT("ifttt");
-
-    private String name;
-
-    BusinessTypeEnum(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    IFTTT
 }

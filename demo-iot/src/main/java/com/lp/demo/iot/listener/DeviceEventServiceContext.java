@@ -15,9 +15,9 @@ import java.util.Map;
 public class DeviceEventServiceContext {
 //    public static final Map<String, DeviceEventService> HANDLER_MAP = new HashMap<>();
     // 存放带有EventType注解的方法
-    public static final Map<String, Method> METHOD_MAP = new HashMap<>();
+    public static final Map<String, Method> EVENT_MAP = new HashMap<>();
     // 存放带有BusinessType注解的类
-    public static final Map<String, Class> CLAZZ_MAP = new HashMap<>();
+    public static final Map<String, Class> BUSINESS_MAP = new HashMap<>();
 
 //    public DeviceEventService getDeviceEventService(String type) {
 //        return HANDLER_MAP.get(type);
@@ -28,17 +28,17 @@ public class DeviceEventServiceContext {
 //    }
 
     public Method getDeviceEventServiceMethod(String type) {
-        return METHOD_MAP.get(type);
+        return EVENT_MAP.get(type);
     }
     public void putDeviceEventServiceMethod(String type, Method deviceEventServiceMethod) {
-        METHOD_MAP.put(type, deviceEventServiceMethod);
+        EVENT_MAP.put(type, deviceEventServiceMethod);
     }
 
     public Class getDeviceEventServiceClazz(String type) {
-        return CLAZZ_MAP.get(type);
+        return BUSINESS_MAP.get(type);
     }
     public void putDeviceEventServiceClazz(String type, Class deviceEventServiceClazz) {
-        CLAZZ_MAP.put(type, deviceEventServiceClazz);
+        BUSINESS_MAP.put(type, deviceEventServiceClazz);
     }
 
 }

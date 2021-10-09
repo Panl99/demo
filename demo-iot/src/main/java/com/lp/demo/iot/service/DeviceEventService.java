@@ -1,6 +1,7 @@
 package com.lp.demo.iot.service;
 
 
+import com.lp.demo.common.result.JsonResult;
 import com.lp.demo.iot.entity.EventInfo;
 
 /**
@@ -12,7 +13,7 @@ public interface DeviceEventService {
      * 设备控制
      * @param eventInfo
      */
-    String execute(EventInfo eventInfo);
+    JsonResult execute(EventInfo eventInfo);
 //
 //    /**
 //     * 添加设备

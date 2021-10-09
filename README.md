@@ -66,6 +66,7 @@
   - [ResultEnum](demo-common/src/main/java/com/lp/demo/common/result/ResultEnum.java)：返回结果枚举值定义
 - [service](demo-common/src/main/java/com/lp/demo/common/service)：service目录
   - [ThreadMetricService](demo-common/src/main/java/com/lp/demo/common/service/ThreadMetricService.java)：线程统计服务
+  - [ThreadLocalService](demo-common/src/main/java/com/lp/demo/common/service/ThreadLocalService.java)：ThreadLocal服务
 - [test](demo-common/src/main/java/com/lp/demo/common/test)：测试目录
   - [ThreadLocalTest](demo-common/src/main/java/com/lp/demo/common/test/ThreadLocalTest.java)：ThreadLocal简单测试
 

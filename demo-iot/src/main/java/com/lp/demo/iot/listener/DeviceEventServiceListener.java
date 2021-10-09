@@ -24,20 +24,20 @@ public class DeviceEventServiceListener implements ApplicationListener<ContextRe
         beans.forEach((name, bean) -> {
             BusinessType type = bean.getClass().getAnnotation(BusinessType.class);
 //            eventServiceContext.putDeviceEventService(type.name().getName(), bean);
-            eventServiceContext.putDeviceEventServiceClazz(type.name().getName(), bean.getClass());
+            eventServiceContext.putDeviceEventServiceClazz(type.value().name(), bean.getClass());
 
             Method[] methods = bean.getClass().getDeclaredMethods();
             for (Method method : methods) {
                 if (method.isAnnotationPresent(EventType.class)) {
                     EventType eventType = method.getAnnotation(EventType.class);
-                    eventServiceContext.putDeviceEventServiceMethod(type.name().getName()+"."+eventType.name().getName(), method);
+                    eventServiceContext.putDeviceEventServiceMethod(type.value()+"."+eventType.value(), method);
                 }
             }
 
         });
 //        System.out.println("DeviceEventServiceContext.HANDLER_MAP = " + DeviceEventServiceContext.HANDLER_MAP);
-        System.out.println("DeviceEventServiceContext.CLASS_MAP = " + DeviceEventServiceContext.CLAZZ_MAP);
-        System.out.println("DeviceEventServiceContext.METHOD_MAP = " + DeviceEventServiceContext.METHOD_MAP);
+        System.out.println("DeviceEventServiceContext.BUSINESS_MAP = " + DeviceEventServiceContext.BUSINESS_MAP);
+        System.out.println("DeviceEventServiceContext.EVENT_MAP = " + DeviceEventServiceContext.EVENT_MAP);
 
     }
 }

@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
  * @date 2021/8/5 9:52
  **/
 @Component
-@BusinessType(name = BusinessTypeEnum.AWS)
+@BusinessType(value = BusinessTypeEnum.AWS)
 public class AwsDeviceEventHandler {
 
-    @EventType(name = EventTypeEnum.QUERY)
+    @EventType(value = EventTypeEnum.QUERY)
     public String query(EventInfo eventInfo) {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>AwsDeviceEventHandler.query---------eventInfo = "+ eventInfo);
 
@@ -37,12 +37,12 @@ public class AwsDeviceEventHandler {
         return jsonArray.toString();
     }
 
-    @EventType(name = EventTypeEnum.ADD)
+    @EventType(value = EventTypeEnum.ADD)
     public void add(EventInfo eventInfo) {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>AwsDeviceEventHandler.add---------eventInfo = "+ eventInfo);
     }
 
-    @EventType(name = EventTypeEnum.DELETE)
+    @EventType(value = EventTypeEnum.DELETE)
     public void del(EventInfo eventInfo) {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>AwsDeviceEventHandler.del---------eventInfo = "+ eventInfo);
     }

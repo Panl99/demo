@@ -1,10 +1,13 @@
 package com.lp.demo.iot.entity;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lp.demo.iot.enums.BusinessTypeEnum;
+import com.lp.demo.iot.enums.EventTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -21,12 +24,14 @@ public class EventInfo implements Serializable {
     /**
      * 业务类型
      */
-    private String businessType;
+    @NotNull(message = "业务类型不能为空")
+    private BusinessTypeEnum businessType;
 
     /**
      * 事件类型
      */
-    private String eventType;
+    @NotNull(message = "事件类型不能为空")
+    private EventTypeEnum eventType;
 
     /**
      * 事件消息内容

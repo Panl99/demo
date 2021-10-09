@@ -6,15 +6,15 @@ package com.lp.demo.iot.enums;
  **/
 public enum EventTypeEnum {
     // 查询设备
-    QUERY("query"),
+    QUERY,/*("query"),*/
     // 添加设备
-    ADD("add"),
+    ADD,/*("add"),*/
     // 设备刷新
-    REFRESH("refresh"),
+    REFRESH,/*("refresh"),*/
     // 设备同步给app
-    SYNC("sync"),
+    SYNC,/*("sync"),*/
     // 设备删除
-    DELETE("delete");
+    DELETE/*("delete");*/
 /*    // 设备执行
     EXECUTE("execute"),
     // 设备状态上报
@@ -44,13 +44,13 @@ public enum EventTypeEnum {
     // 网关在线状态
     ONLINE_STATUS("online_status");*/
 
-    private String name;
-
-    EventTypeEnum(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+//    private String name;
+//
+//    EventTypeEnum(String name) {
+//        this.name = name;
+//    }
+//
+//    public String getName() {
+//        return name;
+//    }
 }
