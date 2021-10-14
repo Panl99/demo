@@ -15,9 +15,9 @@ import java.time.temporal.ChronoUnit;
  * @date 2021/9/18 14:16
  **/
 @Mapper
-public interface CommonMapper {
+public interface CommonStructMapper {
 
-    CommonMapper MAPPER = Mappers.getMapper(CommonMapper.class);
+    CommonStructMapper MAPPER = Mappers.getMapper(CommonStructMapper.class);
 
     @Mappings({
 //            @Mapping(source = "name", target = "userName"),

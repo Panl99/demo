@@ -14,5 +14,7 @@ public enum BusinessTypeEnum {
     // 谷歌业务
     GOOGLE,
     // 自动化（If This Then That）
-    IFTTT
+    IFTTT,
+    // 默认
+    DEFAULT
 }

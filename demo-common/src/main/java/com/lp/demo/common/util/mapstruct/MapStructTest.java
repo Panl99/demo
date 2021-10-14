@@ -12,7 +12,7 @@ public class MapStructTest {
     public static void main(String[] args) {
         UserDto userDto = UserDto.initUserDto();
 
-        User user = CommonMapper.MAPPER.user2userDto(userDto);
+        User user = CommonStructMapper.MAPPER.user2userDto(userDto);
         ConsoleColorUtil.printDefaultColor(user.toString());
     }
 }
