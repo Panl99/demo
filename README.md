@@ -55,6 +55,7 @@
 - [文件解析demo TODO](demo-common/src/main/java/com/lp/demo/common/parsefile)
 
 - [aop](demo-common/src/main/java/com/lp/demo/common/aop)：aop定义
+  - [ThreadPoolUtil](demo-common/src/main/java/com/lp/demo/common/aop/thread/ThreadPoolUtil.java)：线程池工具
 - [async](demo-common/src/main/java/com/lp/demo/common/async)：@Async异步任务定义、测试
 - [enums](demo-common/src/main/java/com/lp/demo/common/enums)：枚举目录
   - [ZoneIdEnum](demo-common/src/main/java/com/lp/demo/common/enums/ZoneIdEnum.java)：时区枚举定义
@@ -67,6 +68,7 @@
 - [service](demo-common/src/main/java/com/lp/demo/common/service)：service目录
   - [ThreadMetricService](demo-common/src/main/java/com/lp/demo/common/service/ThreadMetricService.java)：线程统计服务
   - [ThreadLocalService](demo-common/src/main/java/com/lp/demo/common/service/ThreadLocalService.java)：ThreadLocal服务
+  - [ThreadPoolService](demo-common/src/main/java/com/lp/demo/common/service/ThreadPoolService.java)：自定义线程池服务
 - [test](demo-common/src/main/java/com/lp/demo/common/test)：测试目录
   - [ThreadLocalTest](demo-common/src/main/java/com/lp/demo/common/test/ThreadLocalTest.java)：ThreadLocal简单测试
 
