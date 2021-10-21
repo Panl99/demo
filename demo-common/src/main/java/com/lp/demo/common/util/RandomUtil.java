@@ -13,18 +13,19 @@ import java.util.Random;
 @Slf4j
 public class RandomUtil {
 
-    private static Random random;
+    private static Random random = new SecureRandom();
 
     /**
      * 解决SonarQube扫描报错：Save and re-use this "Random".
+     * [SecureRandom.getInstanceStrong()引发的线程阻塞问题分析](https://blog.csdn.net/weixin_45244678/article/details/106137948)
      */
-    static {
-        try {
-            random = SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            log.info("SecureRandom.getInstanceStrong() error, Exception:{}", e.getMessage());
-        }
-    }
+//    static {
+//        try {
+//            random = SecureRandom.getInstanceStrong();
+//        } catch (NoSuchAlgorithmException e) {
+//            log.info("SecureRandom.getInstanceStrong() error, Exception:{}", e.getMessage());
+//        }
+//    }
 
     public static void main(String[] args) {
 
