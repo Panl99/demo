@@ -17,27 +17,27 @@ import java.time.temporal.ChronoUnit;
 @Mapper
 public interface CommonStructMapper {
 
-    CommonStructMapper MAPPER = Mappers.getMapper(CommonStructMapper.class);
-
-    @Mappings({
-//            @Mapping(source = "name", target = "userName"),
-            @Mapping(target = "userName", expression = "java(concatName(userDto.getAge(), java.time.temporal.ChronoUnit.DAYS))"),
-            @Mapping(source = "phoneNumber", target = "phoneNumber"),
-            @Mapping(source = "age", target = "userId"),
-            @Mapping(source = "name", target = "isStudent", qualifiedByName = "convertStatus")
-    })
-    User user2userDto(UserDto userDto);
-
-    @Named("convertStatus")
-    default Boolean convertStatus(String name) {
-        if ("zhangsan".equals(name)) {
-            return true;
-        }
-        return false;
-    }
-
-    @Named("concatName")
-    default String concatName(Integer value, ChronoUnit unit) {
-        return value + "#" + unit;
-    }
+//    CommonStructMapper MAPPER = Mappers.getMapper(CommonStructMapper.class);
+//
+//    @Mappings({
+////            @Mapping(source = "name", target = "userName"),
+//            @Mapping(target = "userName", expression = "java(concatName(userDto.getAge(), java.time.temporal.ChronoUnit.DAYS))"),
+//            @Mapping(source = "phoneNumber", target = "phoneNumber", ignore = true),
+//            @Mapping(source = "age", target = "userId"),
+//            @Mapping(source = "name", target = "isStudent", qualifiedByName = "convertStatus")
+//    })
+//    User user2userDto(UserDto userDto);
+//
+//    @Named("convertStatus")
+//    default Boolean convertStatus(String name) {
+//        if ("zhangsan".equals(name)) {
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    @Named("concatName")
+//    default String concatName(Integer value, ChronoUnit unit) {
+//        return value + "#" + unit;
+//    }
 }

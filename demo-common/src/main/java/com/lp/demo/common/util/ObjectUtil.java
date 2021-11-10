@@ -311,7 +311,7 @@ public class ObjectUtil {
         if (o instanceof List && ((List) o).stream().allMatch((obj -> (obj instanceof User)))) {
             user.setUserId(10001);
             user.setUserName("10001");
-            user.setPhoneNumber(100010001);
+//            user.setPhoneNumber(100010001);
         }
         List<String> list = new ArrayList<>();
         list.add(user.toString());

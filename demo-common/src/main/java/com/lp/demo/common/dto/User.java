@@ -2,6 +2,8 @@ package com.lp.demo.common.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author lp
  * @date 2021/9/15 17:23
@@ -10,6 +12,6 @@ import lombok.Data;
 public class User {
     Integer userId;
     String userName;
-    Integer phoneNumber;
+    List<Integer> phoneNumberList;
     Boolean isStudent;
 }
