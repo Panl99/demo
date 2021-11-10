@@ -23,6 +23,10 @@ import java.util.Set;
  * @description
  **/
 public class DateUtil {
+
+    private static final String testTime = "2021-09-15 18:10:36";
+    private static final String cstTime = "Wed Nov 10 11:42:54 CST 2021";
+
     public static void main(String[] args) {
         System.out.println("getDate() = " + getDate());
         System.out.println("getDate(caymanZoneId) = " + getDate(ZoneIdEnum.EST.getZoneIdName()));
@@ -39,12 +43,16 @@ public class DateUtil {
         System.out.println("ZonedDateTimeTransform(14, 03, shanghaiZoneId, caymanZoneId) = " + ZonedDateTimeTransform(12, 03, ZoneIdEnum.CTT.getZoneIdName(), ZoneIdEnum.EST.getZoneIdName()));
 
         System.out.println("calculateTime()");
-        calculateTime("2021-09-15 18:10:36", -5);
+        calculateTime(testTime, -5);
 
         // 时间单位测试
         chronoUnitTest();
         // Date与LocalDateTime转换测试
         dateToLocalDateTimeTest();
+
+        // CST时间转GMT时间
+        ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> gmtTime <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
+        covertCST2GMT(cstTime);
     }
 
     /**
@@ -191,6 +199,20 @@ public class DateUtil {
         return targetZoneDateTime.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
+    /**
+     * CST时间转GMT时间
+     * @param cstTime Date的String类型时间
+     * @return
+     */
+    public static String covertCST2GMT(String cstTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long parseTime = Date.parse(cstTime.replace(" CST ", " GMT+0800 "));
+        String gmtTime = sdf.format(new Date(parseTime));
+        ConsoleColorUtil.printDefaultColor("cstTime = "+ sdf.format(new Date(cstTime)));
+        ConsoleColorUtil.printDefaultColor("gmtTime = "+ gmtTime);
+        return gmtTime;
+    }
+
 
     /**
      * TemporalAdjusters用法 TODO
@@ -202,7 +224,8 @@ public class DateUtil {
      * @since 1.8
      */
     public static void chronoUnitTest() {
-        ConsoleColorUtil.printDefaultColor(">>>>>>>>>>>>>>>>>>>>>>>>>>>>chronoUnitTest<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> chronoUnitTest <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
+
         // 当前日期
         LocalDate today = LocalDate.now();
         ConsoleColorUtil.printDefaultColor("Current date: " + today);
@@ -244,7 +267,8 @@ public class DateUtil {
     }
 
     public static void dateToLocalDateTimeTest() {
-        ConsoleColorUtil.printDefaultColor(">>>>>>>>>>>>>>>>>>>>>>>>>>>>dateToLocalDateTime<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> dateToLocalDateTime <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
+
         Date date = new Date();
         ConsoleColorUtil.printDefaultColor("date: "+ date);
 
