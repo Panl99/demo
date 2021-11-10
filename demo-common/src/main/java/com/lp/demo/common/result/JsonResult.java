@@ -1,7 +1,9 @@
 package com.lp.demo.common.result;
 
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.lp.demo.common.dto.UserDto;
+import com.lp.demo.common.util.ConsoleColorUtil;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -51,6 +53,9 @@ public class JsonResult<T> implements Serializable {
         this.data = data;
     }
 
+    public String toJsonString() {
+        return JSONObject.toJSONString(this);
+    }
 
     public static void main(String[] args) {
         JsonResult<UserDto> result1 = new JsonResult<>();
@@ -66,5 +71,8 @@ public class JsonResult<T> implements Serializable {
         System.out.println(JSONUtil.parse(result4).toStringPretty());
 
         System.out.println(new Date(1626486228144L));
+
+        String result5 = new JsonResult<>(ResultEnum.SUCCESS, UserDto.initUserDto()).toJsonString();
+        ConsoleColorUtil.printDefaultColor(result5);
     }
 }
