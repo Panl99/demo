@@ -24,6 +24,7 @@
         <projectlombok.version>1.18.20</projectlombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <zxing.version>3.4.1</zxing.version>
+        <reflectasm.version>1.11.9</reflectasm.version>
     </properties>
 
     <dependencies>
@@ -148,6 +149,13 @@
             <version>${zxing.version}</version>
         </dependency>
         <!--二维码生成工具 end-->
+        <!--高性能反射工具-->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>reflectasm</artifactId>
+            <version>${reflectasm.version}</version>
+        </dependency>
+        <!--高性能反射工具 end-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
