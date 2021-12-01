@@ -34,7 +34,8 @@ import java.util.Random;
  **/
 public class QRCodeUtil {
     // 二维码存储路径
-    private static final String QR_CODE_PATH = "D:\\Doc\\BusinessDoc\\IP425-18晶讯平台报警器项目";
+    private static final String CURRENT_PATH = System.getProperty("user.dir"); //new File("").getAbsolutePath()
+    private static final String QR_CODE_PATH = CURRENT_PATH;
     // logo图片路径
     private static final String LOGO_PATH = "D:\\Others\\tx.jpg";
     // 编码格式
@@ -303,9 +304,10 @@ public class QRCodeUtil {
 
         String qrCodeLogo = encode(ironMan, LOGO_PATH, QR_CODE_PATH);
         String qrCodeNoLogo = encode(ironMan, QR_CODE_PATH);
-        System.out.println("有LOGO：" + qrCodeLogo + "\n无LOGO：" + qrCodeNoLogo);
+        System.out.println("有LOGO：" + QR_CODE_PATH + File.separator + qrCodeLogo
+                + "\n无LOGO：" + QR_CODE_PATH + File.separator + qrCodeNoLogo);
 
-        String decodeQRCode = decode(QR_CODE_PATH + "\\" + qrCodeLogo);
+        String decodeQRCode = decode(QR_CODE_PATH + File.separator + qrCodeLogo);
         System.out.println("decodeQRCode = " + decodeQRCode);
     }
 }
