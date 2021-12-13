@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalAmount;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,6 +54,9 @@ public class DateUtil {
         // CST时间转GMT时间
         ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> gmtTime <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
         covertCST2GMT(cstTime);
+
+        //
+        getFirstOrLastTime();
     }
 
     /**
@@ -297,5 +301,32 @@ public class DateUtil {
         Date datePlus = Date.from(dateTimePlus.atZone(ZoneId.systemDefault()).toInstant());
         ConsoleColorUtil.printDefaultColor("datePlus = "+ datePlus);
         return datePlus;
+    }
+
+    public static void getFirstOrLastTime() {
+        ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> getFirstOrLastTime <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
+
+        // 获取今年第一天及最后一天
+        LocalDateTime firstDayOfYear = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear())), LocalTime.MIN);
+        LocalDateTime lastDayOfYear = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear())), LocalTime.MAX);
+
+        // 获取当前月第一天及最后一天
+        LocalDateTime firstDayOfMonth = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())), LocalTime.MIN);
+        LocalDateTime lastDayOfMonth = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth())), LocalTime.MAX);
+
+        // 获取当天的起始时间
+        LocalDateTime firstTimeOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime lastTimeOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+
+        ConsoleColorUtil.printDefaultColor("firstDayOfYear = "+ firstDayOfYear
+                + "\n lastDayOfYear = "+ lastDayOfYear
+                + "\n firstDayOfMonth = "+ firstDayOfMonth
+                + "\n lastDayOfMonth = "+ lastDayOfMonth
+                + "\n firstTimeOfDay = "+ firstTimeOfDay
+                + "\n lastTimeOfDay = "+ lastTimeOfDay);
+
+        // LocalDateTime转为Date
+        Date date = Date.from(firstDayOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+        ConsoleColorUtil.printDefaultColor("date format for firstDayOfMonth = "+ date);
     }
 }
