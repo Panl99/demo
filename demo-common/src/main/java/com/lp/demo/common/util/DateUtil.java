@@ -2,6 +2,7 @@ package com.lp.demo.common.util;
 
 import com.lp.demo.common.enums.ZoneIdEnum;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -13,7 +14,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.TemporalAmount;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
@@ -27,6 +27,7 @@ public class DateUtil {
 
     private static final String testTime = "2021-09-15 18:10:36";
     private static final String cstTime = "Wed Nov 10 11:42:54 CST 2021";
+    private static final String format = "yyyy-MM-dd HH:mm:ss";
 
     public static void main(String[] args) {
         System.out.println("getDate() = " + getDate());
@@ -55,8 +56,15 @@ public class DateUtil {
         ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> gmtTime <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
         covertCST2GMT(cstTime);
 
-        //
+        // 本年、本月、当天的开始、结束时间
         getFirstOrLastTime();
+
+        // 16进制时间转换
+        ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> HexTime <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
+        String unixTime = dateTo4byteHexTime(testTime, format);
+        ConsoleColorUtil.printDefaultColor("unixTime = " + unixTime);
+        String formatTime = hexTime4ByteToDate(unixTime, format);
+        ConsoleColorUtil.printDefaultColor("formatTime = " + formatTime);
     }
 
     /**
@@ -328,5 +336,41 @@ public class DateUtil {
         // LocalDateTime转为Date
         Date date = Date.from(firstDayOfMonth.atZone(ZoneId.systemDefault()).toInstant());
         ConsoleColorUtil.printDefaultColor("date format for firstDayOfMonth = "+ date);
+    }
+
+
+    /**
+     * 4字节16进制时间戳 转化成正常时间格式
+     *
+     * @param hexTime
+     * @param format
+     * @return
+     */
+    public static String hexTime4ByteToDate(String hexTime, String format) {
+        DateFormat df = new SimpleDateFormat(format);
+        long six = Long.parseLong(hexTime,16);
+        String time = String.valueOf(six * 1000);
+        return df.format(new Date(Long.parseLong(time)));
+    }
+
+    //2021-09-15 18:10:36 -> 6141C69C
+    public static String dateTo4byteHexTime(String date, String format) {
+        StringBuilder unixTime = new StringBuilder();
+        try {
+            DateFormat df = new SimpleDateFormat(format);
+            long time = df.parse(date).getTime();
+            String hex = Long.toHexString(time/1000);
+            StringBuilder zero = new StringBuilder();
+            for (int i = 0; i < 8; i++) {
+                if (hex.length() < 8) {
+                    zero.append("0");
+                }
+            }
+            unixTime = zero.append(hex);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return unixTime.toString().toUpperCase();
+
     }
 }
