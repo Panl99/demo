@@ -5,6 +5,7 @@ import com.lp.demo.common.enums.ZoneIdEnum;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,9 +15,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
+
+import static java.time.ZoneId.systemDefault;
 
 /**
  * @author lp
@@ -123,7 +129,7 @@ public class DateUtil {
      * @return xxxx-xx-xxTxx:xx:xx.xxx
      */
     public static String getDateTimeZone() {
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now(systemDefault());
         return now.toString();
     }
 
@@ -260,6 +266,9 @@ public class DateUtil {
         // 明天此时
         LocalDateTime nextDay = now.plusDays(1);
         ConsoleColorUtil.printDefaultColor("Next day: " + nextDay);
+        // 昨天此时
+        LocalDateTime yesterday = now.minusDays(1);
+        ConsoleColorUtil.printDefaultColor("yesterday: " + yesterday);
         // 下周此时
         LocalDateTime nextWeekTime = now.plusWeeks(1);
         ConsoleColorUtil.printDefaultColor("This time next week: " + nextWeekTime);
@@ -276,6 +285,13 @@ public class DateUtil {
 //        LocalDateTime forever = now.plus(3, ChronoUnit.FOREVER);
 //        ConsoleColorUtil.printDefaultColor("forever: " + forever);
         ConsoleColorUtil.printDefaultColor("forever: " + ChronoUnit.FOREVER.getDuration());
+        Date date = new Date(0L);
+        System.out.println("date = " + date);
+        Date date1 = new Date(ChronoUnit.FOREVER.getDuration().getSeconds() * 1000);
+        System.out.println("date1 = " + date1);
+        boolean equals = date.equals(new Date(0L));
+        System.out.println("equals = " + equals);
+
     }
 
     public static void dateToLocalDateTimeTest() {
@@ -285,14 +301,14 @@ public class DateUtil {
         ConsoleColorUtil.printDefaultColor("date: "+ date);
 
         // Date转为LocalDateTime
-        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), systemDefault());
         ConsoleColorUtil.printDefaultColor("dateTime: "+ dateTime);
 
         LocalDateTime plusDateTime = dateTime.plus(1, ChronoUnit.DAYS);
         ConsoleColorUtil.printDefaultColor("plusDateTime: "+ plusDateTime);
 
         // LocalDateTime转为Date
-        Date plusDate = Date.from(plusDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        Date plusDate = Date.from(plusDateTime.atZone(systemDefault()).toInstant());
         ConsoleColorUtil.printDefaultColor("plusDate: "+ plusDate);
 
         //
@@ -301,30 +317,44 @@ public class DateUtil {
 
 
     private static Date getExpireTime(Date date, Integer value, ChronoUnit unit) {
-        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), systemDefault());
         LocalDateTime dateTimePlus = dateTime.plus(value, unit);
         ConsoleColorUtil.printDefaultColor("dateTimePlus = "+ dateTimePlus);
 
         // LocalDateTime转为Date
-        Date datePlus = Date.from(dateTimePlus.atZone(ZoneId.systemDefault()).toInstant());
+        Date datePlus = Date.from(dateTimePlus.atZone(systemDefault()).toInstant());
         ConsoleColorUtil.printDefaultColor("datePlus = "+ datePlus);
         return datePlus;
     }
 
+    // DateTimeUtil
     public static void getFirstOrLastTime() {
         ConsoleColorUtil.printSingleColor(">>>>>>>>>>>>>>>>>> getFirstOrLastTime <<<<<<<<<<<<<<<<", ConsoleColorUtil.ConsoleColorCodeEnum.BLUE.getColorCode(), 1);
-
+        Date parse = null;
+        try {
+            parse = new SimpleDateFormat(format).parse("2021-06-08 10:15:30");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        LocalDateTime dateTime = LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault());
         // 获取今年第一天及最后一天
-        LocalDateTime firstDayOfYear = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear())), LocalTime.MIN);
-        LocalDateTime lastDayOfYear = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear())), LocalTime.MAX);
+        LocalDateTime firstDayOfYear = LocalDateTime.of(LocalDate.from(dateTime.with(TemporalAdjusters.firstDayOfYear())), LocalTime.MIN);
+        LocalDateTime lastDayOfYear = LocalDateTime.of(LocalDate.from(dateTime.with(TemporalAdjusters.lastDayOfYear())), LocalTime.MAX);
 
         // 获取当前月第一天及最后一天
-        LocalDateTime firstDayOfMonth = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())), LocalTime.MIN);
-        LocalDateTime lastDayOfMonth = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth())), LocalTime.MAX);
+        LocalDateTime firstDayOfMonth = LocalDateTime.of(LocalDate.from(dateTime.with(TemporalAdjusters.firstDayOfMonth())), LocalTime.MIN);
+        LocalDateTime lastDayOfMonth = LocalDateTime.of(LocalDate.from(dateTime.with(TemporalAdjusters.lastDayOfMonth())), LocalTime.MAX);
+
+        // 获取当前周第一天及最后一天
+        TemporalField temporalField = WeekFields.of(Locale.SIMPLIFIED_CHINESE).dayOfWeek();
+        LocalDateTime firstDayOfWeek = LocalDateTime.of(LocalDate.from(dateTime.with(temporalField, 1)), LocalTime.MIN);
+        System.out.println("firstDayOfWeek = " + firstDayOfWeek);
+        LocalDateTime lastDayOfWeek = LocalDateTime.of(LocalDate.from(dateTime.with(temporalField, 7)), LocalTime.MAX);
+        System.out.println("lastDayOfWeek = " + lastDayOfWeek);
 
         // 获取当天的起始时间
-        LocalDateTime firstTimeOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
-        LocalDateTime lastTimeOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        LocalDateTime firstTimeOfDay = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MIN);
+        LocalDateTime lastTimeOfDay = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.MAX);
 
         ConsoleColorUtil.printDefaultColor("firstDayOfYear = "+ firstDayOfYear
                 + "\n lastDayOfYear = "+ lastDayOfYear

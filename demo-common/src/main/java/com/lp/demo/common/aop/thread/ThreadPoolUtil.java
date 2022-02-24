@@ -42,4 +42,8 @@ public class ThreadPoolUtil {
             executor.shutdown();
         }
     }
+
+    public static ThreadPoolTaskExecutor getExecutor() {
+        return executor;
+    }
 }

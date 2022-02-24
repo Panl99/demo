@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -265,6 +266,9 @@ public class ObjectUtil {
         List<Object> resultList = distinctObjAbstract(userList, "name","age","hobby");
         System.out.println(resultList);
 
+
+        listRemove(hobby);
+
     }
 
     /**
@@ -337,6 +341,48 @@ public class ObjectUtil {
         public Class<T> getGenericType() {
             return genericType;
         }
+    }
+
+
+    /**
+     * list remove
+     */
+    public static List<String> listRemove(List<String> paramList) {
+        List<String> list = new ArrayList<>(5);
+        list.add("篮球");
+        list.add("羽毛球");
+        list.add("看电影");
+        list.add("看书");
+        list.add("打游戏");
+
+//        Iterator<String> iterator = paramList.iterator();
+//        while (iterator.hasNext()) {
+//            String param = iterator.next();
+//            if (!list.contains(param)) {
+//                iterator.remove();
+//            }
+//        }
+         paramList.removeIf(param -> !list.contains(param));
+
+
+        for (String s : list) {
+//            if (iterator.hasNext()) {
+//                String param = iterator.next();
+//                if (s.equals(param)) {
+//                    iterator.remove();
+//                }
+//            }
+            paramList.remove(s);
+        }
+
+
+        System.out.println("list = " + list);
+        System.out.println("listRemove = " + paramList);
+
+        List<Integer> lengthList = paramList.stream().map(String::length).collect(Collectors.toList());
+        System.out.println("lengthList = " + lengthList);
+
+        return paramList;
     }
 
 }
