@@ -31,6 +31,7 @@
         <module>demo-sentinel</module>
         <module>demo-jwt</module>
         <module>demo-xxljob</module>
+        <module>demo-api</module>
     </modules>
 
     <properties>

@@ -25,6 +25,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <zxing.version>3.4.1</zxing.version>
         <reflectasm.version>1.11.9</reflectasm.version>
+        <aliyun-oss.version>3.14.0</aliyun-oss.version>
     </properties>
 
     <dependencies>
@@ -156,6 +157,12 @@
             <version>${reflectasm.version}</version>
         </dependency>
         <!--高性能反射工具 end-->
+
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>${aliyun-oss.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
