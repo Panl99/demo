@@ -64,9 +64,9 @@ public class EndianUtil {
         System.out.println(">>>>>>>>>>" + Integer.reverseBytes(Integer.parseInt(heartRateLittleEndianTime, 16)));*/
 
         String oneBytes = "62";
-        String twoBytes = "623b";
+        String twoBytes = "61a6";
         String threeBytes = "623b08";
-        String fourBytes = "623b0828";
+        String fourBytes = "61a64cd8";
         String fiveBytes = "623b082801";
 
 //        System.out.println("convertEndian(oneBytes, 1) = " + convertEndian(oneBytes, 1)); // 1个字节的不用转
@@ -74,6 +74,10 @@ public class EndianUtil {
 //        System.out.println("convertEndian(threeBytes, 3) = " + convertEndian(threeBytes, 4));
         System.out.println("convertEndian(fourBytes, 4) = " + convertEndian(fourBytes, 4));
 //        System.out.println("convertEndian(fiveBytes, 5) = " + convertEndian(fiveBytes, 10)); // parse会超出int范围
+
+
+        System.out.println("0xd8 | 0xFF = " + (0xd8 & 0xFF));
+        System.out.println("-40 | 0xFF = " + (97 & 0xFF));
     }
 
     /**
@@ -95,7 +99,7 @@ public class EndianUtil {
 
         StringBuilder s = new StringBuilder();
         for (byte b : byteBuffer.array()) {
-            String hexString = Integer.toHexString(b);
+            String hexString = Integer.toHexString(b & 0xFF);
             if (hexString.length() < 2) {
                 hexString = "0" + hexString;
             }
