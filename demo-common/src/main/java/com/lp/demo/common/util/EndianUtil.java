@@ -64,20 +64,24 @@ public class EndianUtil {
         System.out.println(">>>>>>>>>>" + Integer.reverseBytes(Integer.parseInt(heartRateLittleEndianTime, 16)));*/
 
         String oneBytes = "62";
-        String twoBytes = "61a6";
+        String twoBytes = "9c18";//"61a6";
         String threeBytes = "623b08";
-        String fourBytes = "61a64cd8";
+        String fourBytes = "fefdfaf9";//"61a64cd8";
         String fiveBytes = "623b082801";
 
-//        System.out.println("convertEndian(oneBytes, 1) = " + convertEndian(oneBytes, 1)); // 1个字节的不用转
         System.out.println("convertEndian(twoBytes, 2) = " + convertEndian(twoBytes, 2));
-//        System.out.println("convertEndian(threeBytes, 3) = " + convertEndian(threeBytes, 4));
         System.out.println("convertEndian(fourBytes, 4) = " + convertEndian(fourBytes, 4));
-//        System.out.println("convertEndian(fiveBytes, 5) = " + convertEndian(fiveBytes, 10)); // parse会超出int范围
 
 
         System.out.println("0xd8 | 0xFF = " + (0xd8 & 0xFF));
-        System.out.println("-40 | 0xFF = " + (97 & 0xFF));
+        System.out.println("-40 | 0xFF = " + (-40 & 0xFF));
+        System.out.println("(0xd8 ^ 0xFF) = " + (0xd8 ^ 0xFF));
+        System.out.println("(0xd8 >> 8) = " + (0xd8 >> 8));
+
+        int i = Integer.parseInt("ffff", 16);
+        System.out.println("i = " + i);
+        System.out.println("(short) i = " + ((short) i & 0xFFFF));
+
     }
 
     /**
@@ -92,9 +96,9 @@ public class EndianUtil {
         ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[capacity]);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         if (capacity % 4 == 0) {
-            byteBuffer.asIntBuffer().put(Integer.parseInt(value, 16));
+            byteBuffer.asIntBuffer().put((int) Long.parseLong(value, 16));
         } else if (capacity % 2 == 0) {
-            byteBuffer.asShortBuffer().put(Short.parseShort(value, 16));
+            byteBuffer.asShortBuffer().put((short) Integer.parseInt(value, 16));
         }
 
         StringBuilder s = new StringBuilder();
