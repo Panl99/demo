@@ -32,6 +32,7 @@
         <module>demo-jwt</module>
         <module>demo-xxljob</module>
         <module>demo-api</module>
+        <module>demo-action</module>
     </modules>
 
     <properties>

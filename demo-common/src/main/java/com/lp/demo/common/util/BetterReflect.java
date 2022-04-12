@@ -2,8 +2,6 @@ package com.lp.demo.common.util;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.google.common.base.Stopwatch;
-import com.lp.demo.common.designpatterns.singletonpattern.Singleton;
-import com.lp.demo.common.dto.UserDto;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
