@@ -16,9 +16,10 @@ public class ArrayDemo {
         int[] nums = {1,2,3};
 
         // 找出数组中重复数字
+        System.out.println(getNum());
 
         //打印不重复元素
-        System.out.println(getNum());
+        System.out.println(getNum2()); // 使用亦或
 
 
         // 二维数组中查找目标值
@@ -46,12 +47,6 @@ public class ArrayDemo {
      * 思路：可以使用数组下标定位元素
      *      使用哈希表的话，时间复杂度：O(n)；空间复杂度：O(n)。
      */
-
-    /**
-     * 任给一个数组，其中只有一个元素是单独出现，其他是成对出现，输出单独的元素。
-     *     例如： 输入： {2,2,1,1,4,4,7}
-     *     输出：7
-     */
     public static int[] getNum() {
         int[] nums = {2,2,1,1,5,4,4,7};
         List<Integer> res = new ArrayList<>();
@@ -68,6 +63,26 @@ public class ArrayDemo {
             System.out.print(i + " ");
         }
         return res.stream().mapToInt(Integer::valueOf).toArray();
+    }
+
+    /**
+     * 任给一个数组，其中只有一个元素是单独出现，其他是成对出现，输出单独的元素。
+     *     例如： 输入： {2,2,1,1,4,4,7}
+     *     输出：7
+     * 思路：使用亦或^运算：相同数字亦或结果为0,0亦或任何数都得任何数,亦或具有交换性：a^b^c = c^b^a
+     *      1 0 0 1 0 1
+     *    ^
+     *      0 0 1 0 0 1
+     * 结果：
+     *      1 0 1 1 0 0
+     */
+    public static int getNum2() {
+        int[] nums = {2,1,2,4,1,5,4};
+        int result = 0;
+        for (int i = 0; i < nums.length; i++) {
+            result ^= nums[i];
+        }
+        return result;
     }
 
     /**
