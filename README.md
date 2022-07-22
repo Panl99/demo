@@ -1,5 +1,6 @@
 # 目录
 - [demo简介](#demo)
+  - [demo-action](#demo-action)
   - [demo-main](#demo-main)
   - [demo-common](#demo-common)
   - [demo-redis](#demo-redis)
@@ -26,6 +27,13 @@
 
 # demo
 常用技术用法实践。
+
+## demo-action
+[README.md](demo-action/README.md)
+- [Java实战 (java_in_action)](demo-action/src/main/java/com/lp/demo/action/java_in_action)
+- [设计模式 (designpatterns_in_action)](demo-action/src/main/java/com/lp/demo/action/designpatterns_in_action)
+- [算法题 (leetcode_in_action)](demo-action/src/main/java/com/lp/demo/action/leetcode_in_action)
+- [Spring系列实战 (spring_in_action)](demo-action/src/main/java/com/lp/demo/action/spring_in_action)
 
 ## demo-main
 - [MainController](demo-main/src/main/java/com/lp/demo/main/controller/MainController.java)

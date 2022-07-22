@@ -95,6 +95,7 @@
 - [ ] [CountDownLatchDemo](src/main/java/com/lp/demo/action/java_in_action/CountDownLatchDemo.java)
 - [ ] [InetAddressDemo](src/main/java/com/lp/demo/action/java_in_action/InetAddressDemo.java)
 - [ ] [SemaphoreDemo](src/main/java/com/lp/demo/action/java_in_action/SemaphoreDemo.java)
+- [X] [防抖Debouncer](src/main/java/com/lp/demo/action/java_in_action/debounce)
 
 
 [目录](#目录)
