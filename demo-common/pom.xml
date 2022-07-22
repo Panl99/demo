@@ -19,7 +19,7 @@
         <java.version>1.8</java.version>
         <swagger.version>1.5.20</swagger.version>
         <poi.version>4.1.2</poi.version>
-        <easyexcel.version>2.2.10</easyexcel.version>
+        <easyexcel.version>3.1.0</easyexcel.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <projectlombok.version>1.18.20</projectlombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
@@ -32,6 +32,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.1</version>
+            <classifier>jdk15</classifier>
         </dependency>
 
 

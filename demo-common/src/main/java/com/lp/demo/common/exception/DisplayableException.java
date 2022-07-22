@@ -18,6 +18,10 @@ public class DisplayableException extends RuntimeException {
         super(code + "|" + msg);
     }
 
+    public DisplayableException(String msg) {
+        super(msg);
+    }
+
     public DisplayableException(ResultEnum result) {
         super(result.getCode() + "|" + result.getMsg());
     }
