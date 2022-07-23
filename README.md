@@ -58,8 +58,6 @@
   - [RandomUtil](demo-common/src/main/java/com/lp/demo/common/util/RandomUtil.java)：随机数工具（安全随机数）
   - [StringUtil](demo-common/src/main/java/com/lp/demo/common/util/StringUtil.java)：字符串工具（字符串校验）
   - [SystemStatusInfoStatisticsUtil](demo-common/src/main/java/com/lp/demo/common/util/SystemStatusInfoStatisticsUtil.java)：系统状态统计（cpu、堆栈、内存等使用率）
-- [设计模式demo](demo-common/src/main/java/com/lp/demo/common/designpatterns)
-- [源码实战demo](demo-common/src/main/java/com/lp/demo/common/codeinaction)
 - [文件解析demo TODO](demo-common/src/main/java/com/lp/demo/common/parsefile)
 
 - [aop](demo-common/src/main/java/com/lp/demo/common/aop)：aop定义
