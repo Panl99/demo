@@ -67,7 +67,7 @@
 - [ ] [建造者模式](src/main/java/com/lp/demo/action/designpatterns_in_action/builderpattern)
 - [ ] [原型模式](src/main/java/com/lp/demo/action/designpatterns_in_action/prototypepattern)
 - [ ] [适配器模式](src/main/java/com/lp/demo/action/designpatterns_in_action/adapterpattern)
-- [ ] [装饰者模式](src/main/java/com/lp/demo/action/designpatterns_in_action/decoratorpattern)
+- [X] [装饰者模式](src/main/java/com/lp/demo/action/designpatterns_in_action/decoratorpattern)
 - [ ] [外观模式](src/main/java/com/lp/demo/action/designpatterns_in_action/facadepattern)
 - [ ] [桥接模式](src/main/java/com/lp/demo/action/designpatterns_in_action/bridgepattern)
 - [ ] [组合模式](src/main/java/com/lp/demo/action/designpatterns_in_action/compositepattern)
