@@ -76,18 +76,20 @@ public class DebounceAspect {
         threadLocalService.setValue(map);
     }
 
-    @After("debounce()")
-    public void afterPointCut(JoinPoint joinPoint) {
+    @After("@annotation(debounce)")
+    public void afterPointCut(JoinPoint joinPoint, Debounce debounce) {
         Map<String, String> map = threadLocalService.getAndRemove();
         if(CollectionUtils.isEmpty(map)){
             return;
         }
-        RMapCache<String, Object> mapCache = redissonClient.getMapCache(CACHE_KEY);
-        if (mapCache.size() == 0) {
-            return;
+        if (debounce.delKey()) {
+            RMapCache<String, Object> mapCache = redissonClient.getMapCache(CACHE_KEY);
+            if (mapCache.size() == 0) {
+                return;
+            }
+            String key = map.get(CACHE_KEY);
+            mapCache.fastRemove(key);
         }
-        String key = map.get(CACHE_KEY);
-        mapCache.fastRemove(key);
     }
 
 }

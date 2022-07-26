@@ -44,4 +44,10 @@ public @interface Debounce {
      */
     String keyArg() default "";
 
+    /**
+     * 是否在业务完成后删除key
+     * true:删除,false:不删除
+     */
+    boolean delKey() default false;
+
 }
