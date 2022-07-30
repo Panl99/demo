@@ -77,11 +77,11 @@
 - [X] [命令模式](src/main/java/com/lp/demo/action/designpatterns_in_action/commandpattern)
 - [X] [备忘录模式](src/main/java/com/lp/demo/action/designpatterns_in_action/mementopattern)
 - [X] [中介者模式](src/main/java/com/lp/demo/action/designpatterns_in_action/mediatorpattern)
-- [ ] [解释器模式](src/main/java/com/lp/demo/action/designpatterns_in_action/interpreterpattern)
+- [X] [解释器模式](src/main/java/com/lp/demo/action/designpatterns_in_action/interpreterpattern)
 - [X] [策略模式](src/main/java/com/lp/demo/action/designpatterns_in_action/strategypattern)
 - [X] [模板方法](src/main/java/com/lp/demo/action/designpatterns_in_action/templatepattern)
 - [X] [状态模式](src/main/java/com/lp/demo/action/designpatterns_in_action/statepattern)
-- [ ] [访问者模式](src/main/java/com/lp/demo/action/designpatterns_in_action/visitorpattern)
+- [X] [访问者模式](src/main/java/com/lp/demo/action/designpatterns_in_action/visitorpattern)
 - [ ] [~~过滤器模式~~]()
 
 
