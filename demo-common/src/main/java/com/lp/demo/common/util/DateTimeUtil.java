@@ -124,6 +124,60 @@ public class DateTimeUtil {
         return Date.from(lastDayOfWeek.atZone(ZoneId.systemDefault()).toInstant());
     }
 
+    public static Date getFirstDayOfPreviousMonths(Date date, int i) {
+        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        LocalDateTime firstDayOfMonth = LocalDateTime.of(LocalDate.from(dateTime.with(TemporalAdjusters.firstDayOfMonth())).minusMonths(i), LocalTime.MIN);
+        return Date.from(firstDayOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date getLastDayOfPreviousMonths(Date date, int i) {
+        LocalDateTime dateTime = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        LocalDateTime lastDayOfMonth = LocalDateTime.of(LocalDate.from(dateTime.with(TemporalAdjusters.lastDayOfMonth())).minusMonths(i), LocalTime.MAX);
+        return Date.from(lastDayOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    /**
+     * 获取指定年月的第一天
+     * @param year
+     * @param month
+     * @return
+     */
+    public static Date getFirstDayOfMonth(int year, int month) {
+        Calendar cal = Calendar.getInstance();
+        //设置年份
+        cal.set(Calendar.YEAR, year);
+        //设置月份
+        cal.set(Calendar.MONTH, month-1);
+        //获取某月最小天数
+        int firstDay = cal.getMinimum(Calendar.DATE);
+        //设置日历中月份的最小天数
+        cal.set(Calendar.DAY_OF_MONTH,firstDay);
+        //格式化日期
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return getFirstTimeOfDay(cal.getTime());
+    }
+
+    /**
+     * 获取指定年月的最后一天
+     * @param year
+     * @param month
+     * @return
+     */
+    public static Date getLastDayOfMonth(int year, int month) {
+        Calendar cal = Calendar.getInstance();
+        //设置年份
+        cal.set(Calendar.YEAR, year);
+        //设置月份
+        cal.set(Calendar.MONTH, month-1);
+        //获取某月最大天数
+        int lastDay = cal.getActualMaximum(Calendar.DATE);
+        //设置日历中月份的最大天数
+        cal.set(Calendar.DAY_OF_MONTH, lastDay);
+        //格式化日期
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return getLastTimeOfDay(cal.getTime());
+    }
+
     /**
      * 是否今天的日期
      *
@@ -265,5 +319,12 @@ public class DateTimeUtil {
         System.out.println(">>>return : "+ nextDay);
 
 
+        Date firstDayOfLastMonth = getFirstDayOfPreviousMonths(new Date(), 3);
+        String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(firstDayOfLastMonth);
+        System.out.println("format = " + format);
+
+        Date lastDayOfPreviousMonths = getLastDayOfPreviousMonths(new Date(), 3);
+        String format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(lastDayOfPreviousMonths);
+        System.out.println("format1 = " + format1);
     }
 }
