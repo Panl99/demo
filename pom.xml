@@ -33,6 +33,7 @@
         <module>demo-xxljob</module>
         <module>demo-api</module>
         <module>demo-action</module>
+        <module>demo-spi</module>
     </modules>
 
     <properties>
