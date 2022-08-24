@@ -34,6 +34,7 @@
         <module>demo-api</module>
         <module>demo-action</module>
         <module>demo-spi</module>
+        <module>demo-reactor</module>
     </modules>
 
     <properties>
