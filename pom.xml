@@ -29,7 +29,7 @@
         <module>demo-iot</module>
         <module>demo-seata</module>
         <module>demo-sentinel</module>
-        <module>demo-jwt</module>
+        <module>demo-auth</module>
         <module>demo-xxljob</module>
         <module>demo-api</module>
         <module>demo-action</module>

@@ -1,12 +1,12 @@
 package com.lp.demo.common.result;
 
-import org.omg.CORBA.TIMEOUT;
+import java.util.Optional;
 
 /**
  * @author lp
  * @date 2021/9/8 11:36
  **/
-public enum ResultEnum {
+public enum ResultEnum implements BaseEnum<ResultEnum> {
     /**
      * 成功
      */
@@ -28,11 +28,23 @@ public enum ResultEnum {
         this.msg = msg;
     }
 
-    public int getCode() {
+    @Override
+    public Integer getCode() {
         return code;
+    }
+
+    @Override
+    public String getName() {
+        return msg;
     }
 
     public String getMsg() {
         return msg;
+    }
+
+
+
+    public static Optional<ResultEnum> of(Integer code) {
+        return Optional.ofNullable(BaseEnum.parseByCode(ResultEnum.class, code));
     }
 }

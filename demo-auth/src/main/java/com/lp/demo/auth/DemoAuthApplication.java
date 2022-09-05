@@ -1,13 +1,13 @@
-package com.lp.demo.jwt;
+package com.lp.demo.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoJwtApplication {
+public class DemoAuthApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DemoJwtApplication.class, args);
+        SpringApplication.run(DemoAuthApplication.class, args);
     }
 
 }

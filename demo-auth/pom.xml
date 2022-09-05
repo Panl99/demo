@@ -9,9 +9,9 @@
     </parent>
 
     <groupId>com.lp.demo</groupId>
-    <artifactId>demo-jwt</artifactId>
+    <artifactId>demo-auth</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo-jwt</name>
+    <name>demo-auth</name>
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>1.8</java.version>
@@ -20,6 +20,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lp.demo</groupId>
+            <artifactId>demo-common</artifactId>
         </dependency>
 
         <dependency>

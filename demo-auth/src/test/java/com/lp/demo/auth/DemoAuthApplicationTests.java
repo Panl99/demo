@@ -1,10 +1,10 @@
-package com.lp.demo.jwt;
+package com.lp.demo.auth;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DemoJwtApplicationTests {
+class DemoAuthApplicationTests {
 
     @Test
     void contextLoads() {

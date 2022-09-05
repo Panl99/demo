@@ -1,6 +1,6 @@
 package com.lp.demo.common.exception;
 
-import com.lp.demo.common.result.ResultEnum;
+import com.lp.demo.common.result.BaseEnum;
 
 import java.util.Arrays;
 import java.util.ListIterator;
@@ -22,12 +22,12 @@ public class DisplayableException extends RuntimeException {
         super(msg);
     }
 
-    public DisplayableException(ResultEnum result) {
-        super(result.getCode() + "|" + result.getMsg());
+    public DisplayableException(BaseEnum result) {
+        super(result.getCode() + "|" + result.getName());
     }
 
-    public DisplayableException(ResultEnum result, String... args) {
-        super(result.getCode() + "|" + fillParameter(result.getMsg(), args));
+    public DisplayableException(BaseEnum result, String... args) {
+        super(result.getCode() + "|" + fillParameter(result.getName(), args));
     }
 
     /**
