@@ -7,6 +7,7 @@ import cn.hutool.core.util.ZipUtil;
 import com.lp.demo.common.exception.DisplayableException;
 import com.lp.demo.common.service.ThreadLocalService;
 import com.lp.demo.common.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -199,5 +200,233 @@ public class ZipUtilDemo {
     public static void unzip(MultipartFile file) throws IOException {
         unzip(file.getInputStream());
     }
+
+/*
+
+
+
+    @PostMapping(value = "/dial/upload")
+    public JsonResult<List<String>> upload(MultipartFile file) {
+        log.info("Start batch upload dial!");
+        if (file == null || file.isEmpty()) {
+            log.error("Upload dial zip file is empty!");
+            throw new DisplayableException("PARAMS_ERROR");
+        }
+        String fileName = file.getOriginalFilename();
+        if (StringUtil.isEmpty(fileName) ) {
+            log.error("File name is empty!");
+            throw new DisplayableException("PARAMS_ERROR");
+        }
+        if (!fileName.endsWith(".zip")) {
+            log.error("Unsupported file type! file = {}", fileName);
+            throw new DisplayableException("PARAMS_ERROR");
+        }
+        List<String> uploadFailedDials;
+        try {
+            uploadFailedDials = ZipUtilDemo.upload(file.getBytes(), fileName);
+        } catch (IOException e) {
+            log.error("Dial file get bytes error! e : ", e);
+            throw new DisplayableException("SERVER_ERROR");
+        }
+        log.info("End batch upload dial!");
+        return new JsonResult<>(uploadFailedDials);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> upload(InputStream is, String fileName) {
+        if (StringUtil.isEmpty(fileName)) {
+            String now = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+            fileName = "DialUploadTempDir_" + now;
+        }
+        File destDir = FileUtil.mkdir(System.getProperty("java.io.tmpdir") + File.separator + fileName);
+        File file = ZipUtil.unzip(is, destDir, CharsetUtil.systemCharset());
+        List<String> uploadFailedDials = save(file);
+        FileUtil.del(destDir);
+        return uploadFailedDials;
+    }
+
+    @Override
+    public List<String> upload(byte[] bytes, String fileName) {
+        return upload(new ByteArrayInputStream(bytes), fileName);
+    }
+
+    private List<String> save(File file) {
+        if (!file.isDirectory()) {
+            log.error("Unzip file is not dir!");
+            throw new DisplayableException(ErrCode.PARAMS_ERROR);
+        }
+        List<Dial> dials = new ArrayList<>();
+        read(file, dials);
+
+        List<String> uploadFailedDials = new ArrayList<>();
+        Date date = new Date();
+        String now = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date);
+        for (Dial dial : dials) {
+            // 上传图片
+            String oss = "https://ossscn.jingxun.xyz/";
+            if (dial.getImgBytes() != null) {
+                String imageBasePath = "watch_band/dial/image/";
+                String imageType = "png";
+                String ossImageName = now + "_" + dial.getName() + "." + imageType;
+                dial.setImage(oss + imageBasePath + ossImageName);
+                try {
+                    UploadUtil.upload2OSS(dial.getImgBytes(), imageType, imageBasePath, ossImageName);
+                } catch (DisplayableException e) {
+                    uploadFailedDials.add(dial.getStyle()+"--"+dial.getName() + ", reason: " +e.getMessage());
+                    continue;
+                }
+            }
+
+            // 上传文件
+            if (dial.getBinBytes() != null) {
+                String fileBasePath = "watch_band/dial/file/";
+                String ossFileName = now + "_" + dial.getName() + ".bin";
+                UploadUtil.upload2OSS(dial.getBinBytes(), "bin", fileBasePath, ossFileName);
+                dial.setFile(oss + fileBasePath + ossFileName);
+            } else {
+                dial.setSize(0);
+            }
+
+            if (dial.getPrice() == null) {
+                dial.setPrice(BigDecimal.ZERO);
+            }
+            if (!StringUtils.isEmpty(dial.getRegion())) {
+                dial.setRegion(dial.getRegion());
+            } else {
+                dial.setRegion(Locale.SIMPLIFIED_CHINESE.getLanguage() + "_" + Locale.SIMPLIFIED_CHINESE.getCountry());
+            }
+            dial.setUploaderId(1L);
+            dial.setUploader("ABCD");
+            dial.setDownloads(0);
+            dial.setGmtCreate(date);
+            dial.setGmtModified(date);
+
+            if (dialMapper.insert(dial) < 1) {
+                log.error("add dial error! dial : {}", dial);
+                throw new DisplayableException(ErrCode.SERVER_ERROR);
+            }
+
+            // TODO get pid list
+            // 添加表盘-产品关系
+            ProductDialRelation productDialRelation = new ProductDialRelation();
+            productDialRelation.setDialId(dial.getId());
+            productDialRelation.setPid(391975958L);
+            productDialRelation.setGmtCreate(date);
+            int count = dialProductRelationMapper.insert(productDialRelation);
+            if (count < 1) {
+                log.error("add dial product relation error! productDialRelation = {}", productDialRelation);
+                throw new DisplayableException(ErrCode.SERVER_ERROR);
+            }
+
+            productDialRelation.setPid(3385460019L);
+            if (dialProductRelationMapper.insert(productDialRelation) < 1) {
+                log.error("add2 dial product relation error! productDialRelation = {}", productDialRelation);
+                throw new DisplayableException(ErrCode.SERVER_ERROR);
+            }
+        }
+        log.warn("Upload failed dials : {}", uploadFailedDials);
+        return uploadFailedDials;
+    }
+
+    private List<Dial> read(File file, List<Dial> dials) {
+        try {
+            File[] files = file.listFiles();
+            if (files == null) {
+                log.error("Files is null");
+                throw new DisplayableException(ErrCode.PARAMS_ERROR);
+            }
+//            log.info(">>>>>> " + file.getName());
+
+            Dial dial = new Dial();
+            Iterator<File> iterator = Arrays.asList(files).iterator();
+            while (iterator.hasNext()) {
+                File subFile = iterator.next();
+                if (subFile.isFile()) {
+                    if (FileUtil.isEmpty(subFile)) {
+                        continue;
+                    }
+
+                    String fileName = subFile.getName();
+//                String fileType = fileName.substring(fileName.lastIndexOf(".") + 1);
+                    // 读取文件
+                    if (fileName.endsWith(".bin")) {
+                        byte[] binBytes = IoUtil.readBytes(FileUtil.getInputStream(subFile));
+                        dial.setBinBytes(binBytes);
+                        dial.setSize((int) Math.ceil(subFile.length() / 1024.00));
+                    }
+
+//                if (!ArrayUtils.contains(imgFileType, fileType.toLowerCase())) {
+//                    System.out.println("Image format error! only supports [png,jpg,jpeg,bmp] format image, image = "+ fileName);
+//                    return;
+//                }
+                    if (fileName.endsWith(".png")) {
+                        byte[] imgBytes = IoUtil.readBytes(FileUtil.getInputStream(subFile));
+                        dial.setImgBytes(imgBytes);
+
+                        // 获取图片宽高
+                        BufferedImage bufferedImage = ImageIO.read(subFile);
+                        if (bufferedImage == null) {
+                            log.error("image format error! img = {}", subFile.getName());
+                            throw new DisplayableException(ErrCode.PARAMS_ERROR);
+                        }
+                        dial.setImageHeight(bufferedImage.getHeight());
+                        dial.setImageWidth(bufferedImage.getWidth());
+                    }
+
+                    if (fileName.endsWith(".txt")) {
+                        if (FileUtil.isEmpty(subFile)) {
+                            log.error("txt is empty!");
+                            throw new DisplayableException(ErrCode.PARAMS_ERROR);
+                        }
+
+                        // 读取文件信息
+                        List<String> lines = FileUtil.readLines(subFile, CharsetUtil.defaultCharset());
+                        for (String line : lines) {
+                            String[] content = line.trim().split("：");
+                            switch (content[0]) {
+                                case "名称":
+                                    dial.setName(content[1].trim());
+                                    break;
+                                case "风格":
+                                    dial.setStyle(content[1].trim());
+                                    break;
+                                case "标签":
+                                    dial.setTag(content[1].replace("；", ";").trim());
+                                    break;
+                                case "作者":
+                                    dial.setAuthor(content[1].trim());
+                                    break;
+                                case "描述":
+                                    dial.setDescribe(content[1].trim());
+                                    break;
+                                case "价格":
+                                    dial.setPrice(BigDecimal.valueOf(Double.parseDouble(content[1].trim())));
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
+                    }
+
+                } else if (subFile.isDirectory()) {
+                    if (FileUtil.isDirEmpty(subFile)) {
+                        continue;
+                    }
+                    read(subFile, dials);
+                }
+            }
+
+            if (StringUtil.isNotEmpty(dial.getName())) {
+                dials.add(dial);
+            }
+        } catch (IOException e) {
+            log.error("Read file error! e: ", e);
+        }
+        return dials;
+    }
+
+*/
 
 }
