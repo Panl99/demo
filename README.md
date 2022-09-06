@@ -15,8 +15,13 @@
   - [demo-iot](#demo-iot)
   - [demo-seata](#demo-seata)
   - [demo-sentinel](#demo-sentinel)
-  - [demo-jwt](#demo-jwt)
+  - [demo-auth](#demo-auth)
   - [demo-xxljob](#demo-xxljob)  
+  - [demo-api](#demo-api)
+  - [demo-action](#demo-action)
+  - [demo-spi](#demo-spi)
+  - [demo-reactor](#demo-reactor)
+  - [demo-spring](#demo-spring)
 - [技术选型](#技术选型)
 - [端口规划](#端口规划)
 - [开发工具](#开发工具)
@@ -120,10 +125,23 @@ iot相关
 
 - [github wiki](https://github.com/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D)
 
-## demo-jwt
+## demo-auth
+
+### [jwt](../demo/demo-auth/src/main/java/com/lp/demo/auth/jwt)
 
 
 ## demo-xxljob
+
+## demo-api
+
+## demo-action
+
+## demo-spi
+
+## demo-reactor
+
+## demo-spring
+
 
 [目录](#目录)
 
