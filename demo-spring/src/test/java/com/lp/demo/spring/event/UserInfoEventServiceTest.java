@@ -24,6 +24,16 @@ class UserInfoEventServiceTest {
     private UserInfoEvent userInfoEvent;
     @Autowired
     private UserRegisterEvent userRegisterEvent;
+    @Autowired
+    private Event<UserDto> event;
+
+    @Test
+    void publishEvent() {
+        // == publishUserInfoEvent()
+        UserDto userDto = UserDto.initUserDto();
+        event.setData(userDto);
+        eventPublisher.publishEvent(event);
+    }
 
     @Test
     void publishUserInfoEvent() {
