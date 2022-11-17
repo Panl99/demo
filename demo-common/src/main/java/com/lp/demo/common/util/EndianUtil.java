@@ -1,8 +1,16 @@
 package com.lp.demo.common.util;
 
+import com.lp.demo.common.exception.DisplayableException;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Stack;
+
+import static jdk.nashorn.internal.objects.NativeString.substring;
 
 /**
  * @author lp
@@ -71,6 +79,7 @@ public class EndianUtil {
 
         System.out.println("convertEndian(twoBytes, 2) = " + convertEndian(twoBytes, 2));
         System.out.println("convertEndian(fourBytes, 4) = " + convertEndian(fourBytes, 4));
+        System.out.println("convertEndian(threeBytes, 3) = " + convertEndian(threeBytes, 3));
 
 
         System.out.println("0xd8 | 0xFF = " + (0xd8 & 0xFF));
@@ -82,6 +91,13 @@ public class EndianUtil {
         System.out.println("i = " + i);
         System.out.println("(short) i = " + ((short) i & 0xFFFF));
 
+        convertEndian();
+
+        String value = "7FFEFDFCFBFAF908";
+        String s = convertEndianByByteBuf(value);
+        System.out.println("s = " + s);
+        long l = Long.parseLong(s, 16);
+        System.out.println("l = " + l);
     }
 
     /**
@@ -113,6 +129,64 @@ public class EndianUtil {
         return s.toString();
     }
 
+
+    /**
+     * 大小端转换，手动转，不限长度
+     */
+    public static void convertEndian() {
+        String value = "0102030405060708090A0B0C0D0E0F";
+        Stack<String> stack = new Stack<>();
+        String byteValue = "";
+        char[] chars = value.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            if (i != 0 && i % 2 == 0) {
+                stack.push(byteValue);
+                byteValue = "";
+            }
+            byteValue += chars[i];
+        }
+        if (byteValue.length() == 1) {
+            byteValue = "0" + byteValue;
+        }
+        stack.push(byteValue);
+        if (stack.isEmpty()) {
+            return;
+        }
+        String pop = "";
+        while (!stack.isEmpty()) {
+            pop += stack.pop();
+        }
+        System.out.println("pop = " + pop);
+    }
+
+    /**
+     *
+     * @param value  最大Long.MAX_VALUE
+     * @return
+     */
+    public static String convertEndianByByteBuf(String value) {
+        if (StringUtil.isEmpty(value)) {
+            return "";
+        }
+        if (value.length() % 2 != 0) {
+            return "";
+        }
+        if (value.length() > 16) {
+            return "";
+        }
+        if (value.length() == 16 && Integer.parseInt(value.substring(0, 2), 16) > 0x7F) {
+            return "";
+        }
+        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.buffer();
+        byteBuf.writeLongLE(Long.parseLong(value, 16));
+        long longBE = byteBuf.getLong(0);
+        System.out.println("longBE = " + longBE);
+        String hexBE = Long.toHexString(longBE);
+        if (hexBE.length() % 2 != 0) {
+            hexBE = "0" + hexBE;
+        }
+        return hexBE.substring(0, value.length());
+    }
 
 /*    public static String convertToLittleEndian(int bigEndian, int capacity) {
         System.out.println("bigEndian = " + bigEndian);
