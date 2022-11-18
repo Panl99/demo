@@ -72,7 +72,7 @@
 - [X] [桥接模式](src/main/java/com/lp/demo/action/designpatterns_in_action/bridgepattern)
 - [X] [组合模式](src/main/java/com/lp/demo/action/designpatterns_in_action/compositepattern)
 - [X] [享元模式](src/main/java/com/lp/demo/action/designpatterns_in_action/flyweightpattern)
-- [X] [责任链模式](src/main/java/com/lp/demo/action/designpatterns_in_action/chain_of_responsibilitypattern)
+- [X] [责任链模式](src/main/java/com/lp/demo/action/designpatterns_in_action/chainofresponsibilitypattern)
 - [X] [迭代器模式](src/main/java/com/lp/demo/action/designpatterns_in_action/iteratorpattern)
 - [X] [命令模式](src/main/java/com/lp/demo/action/designpatterns_in_action/commandpattern)
 - [X] [备忘录模式](src/main/java/com/lp/demo/action/designpatterns_in_action/mementopattern)
@@ -88,20 +88,26 @@
 [目录](#目录)
 
 # java_in_action
+[java.md](https://github.com/Panl99/codebook/blob/master/java/java.md)
+
 - [ ] [ConcurrentHashMapDemo](src/main/java/com/lp/demo/action/java_in_action/ConcurrentHashMapDemo.java)
 - [X] [ConcurrentHashSet：利用ConcurrentHashMap实现](src/main/java/com/lp/demo/action/java_in_action/ConcurrentHashSet.java)
 - [X] [定时任务：ScheduledThreadPoolExecutor](src/main/java/com/lp/demo/action/java_in_action/ScheduledThreadPoolExecutorDemo.java)
 - [X] [异步非阻塞：CompletableFuture](src/main/java/com/lp/demo/action/java_in_action/CompletableFutureDemo.java)
-- [ ] [CountDownLatchDemo](src/main/java/com/lp/demo/action/java_in_action/CountDownLatchDemo.java)
+- [X] [CountDownLatchDemo](src/main/java/com/lp/demo/action/java_in_action/CountDownLatchDemo.java)
+- [X] [CyclicBarrierDemo](src/main/java/com/lp/demo/action/java_in_action/CyclicBarrierDemo.java)
+- [X] [SemaphoreDemo](src/main/java/com/lp/demo/action/java_in_action/SemaphoreDemo.java)
+- [X] [ExchangerDemo](src/main/java/com/lp/demo/action/java_in_action/ExchangerDemo.java)
 - [ ] [InetAddressDemo](src/main/java/com/lp/demo/action/java_in_action/InetAddressDemo.java)
-- [ ] [SemaphoreDemo](src/main/java/com/lp/demo/action/java_in_action/SemaphoreDemo.java)
 - [X] [防抖Debouncer](src/main/java/com/lp/demo/action/java_in_action/debounce)
+- [X] [泛型和函数式回调](src/main/java/com/lp/demo/action/java_in_action/泛型和函数式回调)
 
 
 [目录](#目录)
 
 # spring_in_action
 - [X] [异步任务，线程池配置](src/main/java/com/lp/demo/action/spring_in_action/async)
+- [X] [防抖Debounce](src/main/java/com/lp/demo/action/spring_in_action/debounce)
 
 
 [目录](#目录)
