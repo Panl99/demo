@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author lp
@@ -20,6 +21,9 @@ public class JavaFunctionalProgrammingDemo {
     public static void main(String[] args) {
         ConsoleColorUtil.printDefaultColor("=================StreamGroupByTest===================");
         StreamGroupByTest.main(null);
+
+        ConsoleColorUtil.printDefaultColor("=================StreamPeekTest===================");
+        StreamPeekTest.main(null);
 
     }
 
@@ -115,6 +119,25 @@ public class JavaFunctionalProgrammingDemo {
              * 2=(4000.0, [JavaFunctionalInterfaceDemo.StreamGroupByTest.Programmer(name=name-6, level=2, salary=4000, output=6, language=javascript)] ),
              * 4=(4000.0, [JavaFunctionalInterfaceDemo.StreamGroupByTest.Programmer(name=name-9, level=4, salary=4000, output=9, language=javascript)] )
              * }
+             */
+        }
+    }
+
+    static class StreamPeekTest {
+        public static void main(String[] args) {
+            List<String> newList = Stream.of("one", "two", "three", "four")
+                    .filter(e -> e.length() > 3)
+                    .peek(e -> System.out.println("Filtered value: " + e))
+                    .map(String::toUpperCase)
+                    .peek(e -> System.out.println("Mapped value: " + e))
+                    .collect(Collectors.toList());
+            System.out.println("newList = " + newList);
+            /**
+             * Filtered value: three
+             * Mapped value: THREE
+             * Filtered value: four
+             * Mapped value: FOUR
+             * newList = [THREE, FOUR]
              */
         }
     }
