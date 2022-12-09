@@ -25,7 +25,7 @@ public class EndianUtil {
 
         String value = "FFFEFDFCFBFAF9080706050403020100"; // 如果是奇数个字符会忽略掉最后一位
         for (int i = 0; i < value.length() / 2; i++) {
-            String convertEndian = convertEndian(value.substring(i == 0 ? 0 : 2 * i));
+            String convertEndian = convertEndian(value.substring(2 * i));
             System.out.println("convertEndian = " + convertEndian);
         }
     }
