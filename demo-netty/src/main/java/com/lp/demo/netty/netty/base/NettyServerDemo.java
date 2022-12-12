@@ -1,5 +1,6 @@
 package com.lp.demo.netty.netty.base;
 
+import com.lp.demo.common.util.ConsoleColorUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -42,7 +43,7 @@ public class NettyServerDemo {
                         }
                     });
 
-            System.out.println(">>>>>>>>>>netty server start...<<<<<<<<<<");
+            ConsoleColorUtil.printDefaultColor(">>>>>>>>>>netty server start...<<<<<<<<<<");
 
             // 绑定一个端口并且同步，生成一个ChannelFuture异步对象，通过isDone()等方法可以判断异步事件执行情况
             // bind是异步操作，sync()是等待异步操作执行完毕
@@ -53,13 +54,14 @@ public class NettyServerDemo {
                 @Override
                 public void operationComplete(ChannelFuture channelFuture) throws Exception {
                     if (cf.isSuccess()) {
-                        System.out.println(">>>>>>>>>>监听端口9000成功<<<<<<<<<<");
+                        ConsoleColorUtil.printDefaultColor(">>>>>>>>>>监听端口9000成功<<<<<<<<<<");
                     } else {
-                        System.out.println(">>>>>>>>>>监听端口9000失败<<<<<<<<<<");
+                        ConsoleColorUtil.printSingleColor(">>>>>>>>>>监听端口9000失败<<<<<<<<<<", 31, 2);
                     }
                 }
             });
-
+            //(7) 获取 Channel 的CloseFuture，并且阻塞当前线程直到它完成
+            cf.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {

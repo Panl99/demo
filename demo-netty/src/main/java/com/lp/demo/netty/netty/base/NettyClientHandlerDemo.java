@@ -1,9 +1,12 @@
 package com.lp.demo.netty.netty.base;
 
+import com.lp.demo.common.util.ConsoleColorUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 
 /**
@@ -11,7 +14,8 @@ import io.netty.util.CharsetUtil;
  * @author lp
  * @description
  **/
-public class NettyClientHandlerDemo extends ChannelInboundHandlerAdapter {
+@ChannelHandler.Sharable // 标示该实例 可以被多个 Channel 安全地共享
+public class NettyClientHandlerDemo extends SimpleChannelInboundHandler<ByteBuf> {
 
     /**
      * 当客户端连接服务端完成时触发
@@ -30,11 +34,16 @@ public class NettyClientHandlerDemo extends ChannelInboundHandlerAdapter {
      * @param msg
      * @throws Exception
      */
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buf = (ByteBuf) msg;
-        System.out.println(">>>>>>>>>>收到服务端的消息："+ buf.toString(CharsetUtil.UTF_8));
+//    @Override
+//    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+//        ByteBuf buf = (ByteBuf) msg;
+//        System.out.println(">>>>>>>>>>收到服务端的消息："+ buf.toString(CharsetUtil.UTF_8));
+//
+//    }
 
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+        ConsoleColorUtil.printDefaultColor(">>>>>>>>>>收到服务端的消息："+ msg.toString(CharsetUtil.UTF_8));
     }
 
     @Override

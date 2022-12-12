@@ -1,5 +1,6 @@
 package com.lp.demo.netty.netty.base;
 
+import com.lp.demo.common.util.ConsoleColorUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -28,14 +29,17 @@ public class NettyClientDemo {
                         }
                     });
 
-            System.out.println(">>>>>>>>>>netty client start...<<<<<<<<<<");
+            ConsoleColorUtil.printDefaultColor(">>>>>>>>>>netty client start...<<<<<<<<<<");
 
+            // 连接到远程节点，阻塞等待直到连接完成
             ChannelFuture cf = bootstrap.connect("127.0.0.1", 9000).sync();
+            // 阻塞，直到Channel 关闭
             cf.channel().closeFuture().sync();
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
+            // 关闭线程池并且释放所有的资源
             group.shutdownGracefully();
         }
     }
