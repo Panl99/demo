@@ -46,6 +46,7 @@ public class DateUtil {
         System.out.println("getDateTimeFormat() = " + getDateTimeFormat());
         System.out.println("getSimpleDateFormat() = " + getSimpleDateFormat());
         System.out.println("getDateInterval(2021, 5, 1) = " + getDateInterval(2021, 5, 1));
+        System.out.println("getDateIntervalByUntil(2021, 5, 1) = " + getDateIntervalByUntil(2021, 5, 1));
 
         System.out.println("getZoneIds() = " + getZoneIds());
         System.out.println("ZonedDateTimeTransform(14, 03, shanghaiZoneId, caymanZoneId) = " + ZonedDateTimeTransform(12, 03, ZoneIdEnum.CTT.getZoneIdName(), ZoneIdEnum.EST.getZoneIdName()));
@@ -184,7 +185,7 @@ public class DateUtil {
     }
 
     /**
-     * 获取指定日期距今天多少天
+     * 获取指定日期距今天多少天（只算天的差值，不计算年、月的）
      *
      * @param year  指定年
      * @param month 指定月
@@ -194,6 +195,18 @@ public class DateUtil {
     public static int getDateInterval(int year, int month, int day) {
         Period interval = Period.between(LocalDate.of(year, month, day), LocalDate.now());
         return interval.getDays();
+    }
+
+    /**
+     * 获取指定日期距今天多少天（计算年+月+日的差值）
+     *
+     * @param year  指定年
+     * @param month 指定月
+     * @param day   指定日
+     * @return 今天 - 指定日期（今天30号，指定1号，返回29）
+     */
+    public static long getDateIntervalByUntil(int year, int month, int day) {
+        return LocalDate.of(year, month, day).until(LocalDate.now(), ChronoUnit.DAYS);
     }
 
     /**
