@@ -14,8 +14,10 @@ import org.mapstruct.factory.Mappers;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,8 @@ public class LoanUtil {
 
     private static final Input input = new Input();
     private static final InputDiff inputDiff = new InputDiff();
+
+    public static final DecimalFormat DF = new DecimalFormat("#.00");
 
     static {
         input.setUnitPrice(BigDecimal.valueOf(15000));
@@ -59,7 +63,7 @@ public class LoanUtil {
         inputDiff.setTransactionTax(BigDecimal.ZERO);
         inputDiff.setOther(BigDecimal.ZERO);
         inputDiff.setEndDate(LocalDate.now().plusYears(3)); // 3年后
-        int months = Period.between(input.getStartDate(), inputDiff.getEndDate()).getMonths();
+        long months = input.getStartDate().until(inputDiff.getEndDate(), ChronoUnit.MONTHS);
         inputDiff.setFixedDepositRate(DepositRate.getDepositRateByMonth(months));
         inputDiff.setInflationRate(3.5 / 100);
 
@@ -418,29 +422,6 @@ public class LoanUtil {
      */
     public static OutputDiff calculateLoanDiff(Input source, InputDiff target) {
 
-//        15000 * 100 = 150w
-//
-//        0.3 * =150  45w
-//
-//        3y later
-//
-//        12000 *100 = 120w
-//
-//        5000 * 12 * 3 = 18w
-//
-//        45 + 18 = 63 w
-//
-//        120 * 0.7 = 84w 0.8 = 96w
-//
-//        18 ： 5 + 13
-//
-//        150 - 45 - 5 = 100w
-//
-//        45 * 0.03 * 3 + 6 * 0.03 * (3 + 2 + 1) = 4.05 + 1.08 = 5.13w
-//
-//        3y = -63 + -5.13 = 68w + （100 - 84） = -84w
-
-
         Output output = calculateLoan(source);
         if (output == null) {
             return null;
@@ -458,9 +439,9 @@ public class LoanUtil {
                     break;
                 case DOWN_PAYMENT_INTEREST:
                     amount = source.getDownPaymentAmount().multiply(BigDecimal.valueOf(target.getFixedDepositRate().getValue()))
-                            .multiply(BigDecimal.valueOf(target.getFixedDepositRate().getIndex()));
+                            .multiply(BigDecimal.valueOf(target.getFixedDepositRate().getIndex())).negate();
                     // 通货膨胀
-                    inflationAmount = inflationAmount.add(calculateInflationAmount(source.getDownPaymentAmount(), target.getInflationRate(), Period.between(source.getStartDate(), target.getEndDate()).getYears()));
+                    inflationAmount = inflationAmount.add(calculateInflationAmount(source.getDownPaymentAmount(), target.getInflationRate(), source.getStartDate().until(target.getEndDate(), ChronoUnit.YEARS)));
                     break;
                 case MONTHLY_REPAYMENT_INTEREST:
                     // 第1年 * index年利率 + 第2年 * index - 1年利率 + ... + 第index年 * 1年利率
@@ -474,8 +455,8 @@ public class LoanUtil {
                             yearRepaymentTotalAmount = monthlyRepaymentAmount.get(x).getTotalAmount().add(yearRepaymentTotalAmount);
                         }
                         // 年还款额 至今产生的利息
-                        DepositRate yearRate = DepositRate.getDepositRateByMonth((index - i) * 12);
-                        BigDecimal yearRepaymentInterest = yearRepaymentTotalAmount.multiply(BigDecimal.valueOf(yearRate.getValue())).multiply(BigDecimal.valueOf(index - i));
+                        DepositRate yearRate = DepositRate.getDepositRateByMonth((index - i) * 12L);
+                        BigDecimal yearRepaymentInterest = yearRepaymentTotalAmount.multiply(BigDecimal.valueOf(yearRate.getValue())).multiply(BigDecimal.valueOf(index - i)).negate();
                         // 通货膨胀
                         inflationAmount = inflationAmount.add(calculateInflationAmount(yearRepaymentTotalAmount, target.getInflationRate(), index - i));
                         // 总还款额产生的利息
@@ -483,14 +464,14 @@ public class LoanUtil {
                     }
                     break;
                 case TRANSACTION_TAX:
-                    amount = target.getTransactionTax();
+                    amount = target.getTransactionTax().negate();
                     break;
                 case INFLATION:
                     // 首付 * 膨胀率 * 年 + 年还款 * 膨胀率 * 年
                     amount = inflationAmount;
                     break;
                 case OTHER:
-                    amount = target.getOther();
+                    amount = target.getOther().negate();
                     break;
                 default:
                     break;
@@ -499,28 +480,31 @@ public class LoanUtil {
 
             DiffAmount diffAmount = DiffAmount.builder()
                     .title(title.getName())
-                    .amount(amount)
+                    .amount(amount.setScale(2, RoundingMode.HALF_UP))
                     .build();
             diffAmountList.add(diffAmount);
         }
 
         return OutputDiff.builder()
-                .inputDiff(target)
+                .inputDiff(LoanStructMapper.INSTANCE.convert2InputDiffVo(target))
                 .output(output)
-                .totalDiffAmount(totalDiffAmount)
+                .totalDiffAmount(totalDiffAmount.setScale(2, RoundingMode.HALF_UP))
                 .diffAmountList(diffAmountList)
                 .build();
     }
 
-    private static BigDecimal calculateInflationAmount(BigDecimal sourceAmount, double inflationRate, int year) {
-
-        // TODO
-        return BigDecimal.ZERO;
+    /**
+     * 计算通货膨胀的金额差
+     *
+     * @param originalAmount 原始金额
+     * @param inflationRate  通货膨胀率
+     * @param numYears       年限
+     * @return
+     */
+    private static BigDecimal calculateInflationAmount(BigDecimal originalAmount, double inflationRate, long numYears) {
+        BigDecimal inflatedAmount = originalAmount.multiply(BigDecimal.valueOf(Math.pow(1 + inflationRate, numYears)));
+        return inflatedAmount.subtract(originalAmount);
     }
-
-
-
-
 
 
     @Data
@@ -567,9 +551,19 @@ public class LoanUtil {
         private BigDecimal other; // 其它金额
         private LocalDate endDate; // 结束时间
         private DepositRate fixedDepositRate; // 定期存款利率
-        private double inflationRate; // 通货膨胀率
+        private Double inflationRate; // 通货膨胀率
     }
-
+    @Data
+    static class InputDiffVo implements Serializable {
+        private static final long serialVersionUID = -8093507880643356418L;
+        private String currentUnitPrice; // 单价：元
+        private String currentTotalAmount; // 总额
+        private String transactionTax; // 交易税
+        private String other; // 其它金额
+        private String endDate; // 结束时间
+        private String fixedDepositRate; // 定期存款利率
+        private String inflationRate; // 通货膨胀率
+    }
 
     @Data
     @Builder
@@ -590,7 +584,7 @@ public class LoanUtil {
     static class OutputDiff implements Serializable {
         private static final long serialVersionUID = 7251912711090339228L;
         private Output output;
-        private InputDiff inputDiff;
+        private InputDiffVo inputDiff;
         private BigDecimal totalDiffAmount; // 差额
         private List<DiffAmount> diffAmountList; // 差额列表
     }
@@ -774,8 +768,8 @@ public class LoanUtil {
             this.value = value;
         }
 
-        public static DepositRate getDepositRateByMonth(int month) {
-            int year = month / 12;
+        public static DepositRate getDepositRateByMonth(long numMonths) {
+            long year = numMonths / 12;
             int index = DEMAND_DEPOSIT.getIndex();
             DepositRate rate = DEMAND_DEPOSIT;
             for (DepositRate depositRate : DepositRate.values()) {
@@ -798,15 +792,15 @@ public class LoanUtil {
         @Mappings({
                 @Mapping(target = "unitPrice", expression = "java(concatUnit(input.getUnitPrice(), \"元\"))"),
                 @Mapping(target = "area", expression = "java(concatUnit(input.getArea(), \"平方米\"))"),
-                @Mapping(target = "totalAmount", expression = "java(concatUnit(input.getTotalAmount().divide(java.math.BigDecimal.valueOf(10000), 0, java.math.BigDecimal.ROUND_HALF_UP), \"万元\"))"),
+                @Mapping(target = "totalAmount", expression = "java(concatUnit(input.getTotalAmount().divide(java.math.BigDecimal.valueOf(10000), 2, java.math.BigDecimal.ROUND_HALF_UP), \"万元\"))"),
                 @Mapping(target = "downPaymentRatio", expression = "java(concatUnit((int) (input.getDownPaymentRatio().getValue() * 100), \"%\"))"),
-                @Mapping(target = "downPaymentAmount", expression = "java(concatUnit(input.getDownPaymentAmount().divide(java.math.BigDecimal.valueOf(10000), 0, java.math.BigDecimal.ROUND_HALF_UP), \"万元\"))"),
+                @Mapping(target = "downPaymentAmount", expression = "java(concatUnit(input.getDownPaymentAmount().divide(java.math.BigDecimal.valueOf(10000), 2, java.math.BigDecimal.ROUND_HALF_UP), \"万元\"))"),
                 @Mapping(target = "loanPeriodInYears", expression = "java(concatUnit(input.getLoanPeriodInYears().getValue(), \"年\"))"),
                 @Mapping(target = "repaymentType", expression = "java(concatUnit(input.getRepaymentType().getName(), \"\"))"),
                 @Mapping(target = "loanType", expression = "java(concatUnit(input.getLoanType().getName(), \"\"))"),
                 @Mapping(target = "loanInterestRate", expression = "java(convertMap(input.getLoanInterestRate(), \"%\"))"),
                 @Mapping(target = "loanAmount", expression = "java(convertMap(input.getLoanAmount(), \"万元\"))"),
-                @Mapping(target = "totalLoanAmount", expression = "java(concatUnit(input.getTotalLoanAmount(), \"元\"))"),
+                @Mapping(target = "totalLoanAmount", expression = "java(concatUnit(input.getTotalLoanAmount().divide(java.math.BigDecimal.valueOf(10000), 2, java.math.BigDecimal.ROUND_HALF_UP), \"万元\"))"),
                 @Mapping(target = "startDate", expression = "java(input.getStartDate().toString())"),
         })
         InputVo convert2InputVo(Input input);
@@ -822,17 +816,30 @@ public class LoanUtil {
             if ("%".equals(unit)) {
                 Map<LoanType, Double> map = (Map<LoanType, Double>) name;
                 for (Map.Entry<LoanType, Double> entry : map.entrySet()) {
-                    result.put(entry.getKey().getName(), entry.getValue() * 100 + unit);
+                    result.put(entry.getKey().getName(), LoanUtil.DF.format(entry.getValue() * 100) + unit);
                 }
             }
             if ("万元".equals(unit)) {
                 Map<LoanType, BigDecimal> map = (Map<LoanType, BigDecimal>) name;
                 for (Map.Entry<LoanType, BigDecimal> entry : map.entrySet()) {
-                    result.put(entry.getKey().getName(), entry.getValue().divide(BigDecimal.valueOf(10000), 0, BigDecimal.ROUND_HALF_UP) + unit);
+                    result.put(entry.getKey().getName(), entry.getValue().divide(BigDecimal.valueOf(10000), 2, BigDecimal.ROUND_HALF_UP) + unit);
                 }
             }
             return result;
         }
+
+
+        @Mappings({
+                @Mapping(target = "currentUnitPrice", expression = "java(concatUnit(inputDiff.getCurrentUnitPrice(), \"元\"))"),
+                @Mapping(target = "currentTotalAmount", expression = "java(concatUnit(inputDiff.getCurrentTotalAmount().divide(java.math.BigDecimal.valueOf(10000), 2, java.math.BigDecimal.ROUND_HALF_UP), \"万元\"))"),
+                @Mapping(target = "transactionTax", expression = "java(concatUnit(inputDiff.getTransactionTax(), \"元\"))"),
+                @Mapping(target = "other", expression = "java(concatUnit(inputDiff.getOther(), \"元\"))"),
+                @Mapping(target = "fixedDepositRate", expression = "java(LoanUtil.DF.format(inputDiff.getFixedDepositRate().getValue() * 100) + \"%\")"),
+                @Mapping(target = "inflationRate", expression = "java(LoanUtil.DF.format(inputDiff.getInflationRate() * 100) + \"%\")"),
+                @Mapping(target = "endDate", expression = "java(inputDiff.getEndDate().toString())"),
+        })
+        InputDiffVo convert2InputDiffVo(InputDiff inputDiff);
+
     }
 
 
