@@ -30,8 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @desc
  **/
 public class LoanUtil {
-    private static final double COMMERCIAL_LOAN_INTEREST_RATE = 4.9 / 100;
-    private static final double PROVIDENT_FUND_LOAN_INTEREST_RATE = 3.1 / 100;
+    private static final double COMMERCIAL_LOAN_INTEREST_RATE = 4.9 / 100;  // 必填
+    private static final double PROVIDENT_FUND_LOAN_INTEREST_RATE = 3.1 / 100;  // 必填
 
     private static final Input input = new Input();
     private static final InputDiff inputDiff = new InputDiff();
@@ -39,33 +39,33 @@ public class LoanUtil {
     public static final DecimalFormat DF = new DecimalFormat("#.00");
 
     static {
-        input.setUnitPrice(BigDecimal.valueOf(15000));
-        input.setArea(100.00);
+        input.setUnitPrice(BigDecimal.valueOf(15000)); // 必填1
+        input.setArea(100.00); // 必填2
         input.setTotalAmount(input.getUnitPrice().multiply(BigDecimal.valueOf(input.getArea())));
-        input.setDownPaymentRatio(DownPaymentRatio._30);
+        input.setDownPaymentRatio(DownPaymentRatio._30);  // 必填3
         input.setDownPaymentAmount(input.getTotalAmount().multiply(BigDecimal.valueOf(input.getDownPaymentRatio().getValue())));
-        input.setLoanPeriodInYears(LoanPeriodInYears._30YEAR);
-        input.setRepaymentType(RepaymentType.INTEREST_FIRST); // 还款类型 ①
-        input.setLoanType(LoanType.COMMERCIAL_LOAN); // 贷款类型 ②
+        input.setLoanPeriodInYears(LoanPeriodInYears._30YEAR); // 必填4
+        input.setRepaymentType(RepaymentType.INTEREST_FIRST); // 还款类型  // 必填5
+        input.setLoanType(LoanType.COMMERCIAL_LOAN); // 贷款类型  // 必填6
         input.setLoanInterestRate(input.getLoanType().getLoanInterestRate()); // 利率
 
         BigDecimal totalLoanAmount = input.getTotalAmount().subtract(input.getDownPaymentAmount());
         input.setTotalLoanAmount(totalLoanAmount); // 贷款总额
         Map<LoanType, BigDecimal> loanAmount = new ConcurrentHashMap<>(1 << 2);
-        loanAmount.put(LoanType.PROVIDENT_FUND_LOAN, BigDecimal.ZERO); // 公积金贷款金额 BigDecimal.valueOf(60_0000) ③
-        loanAmount.put(LoanType.COMMERCIAL_LOAN, totalLoanAmount.subtract(loanAmount.get(LoanType.PROVIDENT_FUND_LOAN))); // 商贷金额
+        loanAmount.put(LoanType.PROVIDENT_FUND_LOAN, BigDecimal.ZERO); // 公积金贷款金额 BigDecimal.valueOf(60_0000)  // 必填7
+        loanAmount.put(LoanType.COMMERCIAL_LOAN, totalLoanAmount.subtract(loanAmount.get(LoanType.PROVIDENT_FUND_LOAN))); // 商贷金额  // 必填8
         input.setLoanAmount(loanAmount);
-        input.setStartDate(LocalDate.now());
+        input.setStartDate(LocalDate.now());  // 必填9
 
         // n年后
-        inputDiff.setCurrentUnitPrice(BigDecimal.valueOf(12000));
+        inputDiff.setCurrentUnitPrice(BigDecimal.valueOf(12000)); // 必填1
         inputDiff.setCurrentTotalAmount(inputDiff.getCurrentUnitPrice().multiply(BigDecimal.valueOf(input.getArea())));
-        inputDiff.setTransactionTax(BigDecimal.ZERO);
-        inputDiff.setOther(BigDecimal.ZERO);
-        inputDiff.setEndDate(LocalDate.now().plusYears(3)); // 3年后
+        inputDiff.setTransactionTax(BigDecimal.ZERO); // 必填2
+        inputDiff.setOther(BigDecimal.ZERO); // 必填3
+        inputDiff.setEndDate(LocalDate.now().plusYears(3)); // 3年后 // 必填4
         long months = input.getStartDate().until(inputDiff.getEndDate(), ChronoUnit.MONTHS);
         inputDiff.setFixedDepositRate(DepositRate.getDepositRateByMonth(months));
-        inputDiff.setInflationRate(3.5 / 100);
+        inputDiff.setInflationRate(3.5 / 100); // 必填5
 
     }
 
@@ -79,8 +79,18 @@ public class LoanUtil {
         OutputDiff outputDiff = calculateLoanDiff(input, inputDiff);
         System.out.println("outputDiff = " + JSONUtil.parseObj(outputDiff, true, true));
 
+        // 什么价出手不会亏损
+        InputDiffVo inputDiffVo = calculateNoLossPricePlan(input, inputDiff);
+        System.out.println("inputDiffVo = " + JSONUtil.parseObj(inputDiffVo, true, true));
+
     }
 
+    /**
+     * 1.计算贷款信息
+     *
+     * @param in
+     * @return
+     */
     public static Output calculateLoan(Input in) {
         if (in.getRepaymentType() == RepaymentType.INTEREST_FIRST) {
             return calculateInterestFirstRepaymentPlan(in);
@@ -414,7 +424,7 @@ public class LoanUtil {
 
 
     /**
-     * 计算中断贷款 损失/盈利情况
+     * 2.计算中断贷款 损失/盈利情况
      * 大概估略，非专业计算
      *
      * @param
@@ -502,8 +512,57 @@ public class LoanUtil {
      * @return
      */
     private static BigDecimal calculateInflationAmount(BigDecimal originalAmount, double inflationRate, long numYears) {
-        BigDecimal inflatedAmount = originalAmount.multiply(BigDecimal.valueOf(Math.pow(1 + inflationRate, numYears)));
-        return inflatedAmount.subtract(originalAmount);
+        return calculateInflationCurrentAmount(originalAmount, inflationRate, numYears).subtract(originalAmount);
+    }
+
+    private static BigDecimal calculateInflationCurrentAmount(BigDecimal originalAmount, double inflationRate, long numYears) {
+        return originalAmount.multiply(BigDecimal.valueOf(Math.pow(1 + inflationRate, numYears)));
+    }
+
+    /**
+     * 3.出手时多少价不亏损
+     *
+     * @param input     原贷款信息
+     * @param inputDiff 出手时相关信息，
+     * @return
+     */
+    public static InputDiffVo calculateNoLossPricePlan(Input input, InputDiff inputDiff) {
+        Output output = calculateLoan(input);
+        if (output == null) {
+            return null;
+        }
+
+        BigDecimal inflationCurrentAmount = calculateInflationCurrentAmount(input.getTotalAmount(), inputDiff.getInflationRate(), input.getStartDate().until(inputDiff.getEndDate(), ChronoUnit.YEARS));
+
+        BigDecimal downPaymentInterest = input.getDownPaymentAmount().multiply(BigDecimal.valueOf(inputDiff.getFixedDepositRate().getValue()))
+                .multiply(BigDecimal.valueOf(inputDiff.getFixedDepositRate().getIndex()));
+
+        BigDecimal monthlyRepaymentInterest = BigDecimal.ZERO;
+        // 第1年 * index年利率 + 第2年 * index - 1年利率 + ... + 第index年 * 1年利率
+        List<MonthlyRepayment> monthlyRepaymentAmount = output.getMonthlyRepaymentAmount();
+        int index = inputDiff.getFixedDepositRate().getIndex();
+        // 几年
+        for (int i = 0; i < index; i++) {
+            BigDecimal yearRepaymentTotalAmount = BigDecimal.ZERO;
+            // 每年还款金额
+            for (int x = i * 12; x < (i + 1) * 12; x++) {
+                yearRepaymentTotalAmount = monthlyRepaymentAmount.get(x).getTotalAmount().add(yearRepaymentTotalAmount);
+            }
+            // 年还款额 至今产生的利息
+            DepositRate yearRate = DepositRate.getDepositRateByMonth((index - i) * 12L);
+            BigDecimal yearRepaymentInterest = yearRepaymentTotalAmount.multiply(BigDecimal.valueOf(yearRate.getValue())).multiply(BigDecimal.valueOf(index - i));
+
+            // 总还款额产生的利息
+            monthlyRepaymentInterest = yearRepaymentInterest.add(monthlyRepaymentInterest);
+        }
+
+        BigDecimal currentTotalAmount = inflationCurrentAmount.add(downPaymentInterest)
+                .add(monthlyRepaymentInterest)
+                .add(inputDiff.getTransactionTax())
+                .add(inputDiff.getOther());
+        inputDiff.setCurrentTotalAmount(currentTotalAmount);
+        inputDiff.setCurrentUnitPrice(currentTotalAmount.divide(BigDecimal.valueOf(input.getArea()), 2, RoundingMode.HALF_UP));
+        return LoanStructMapper.INSTANCE.convert2InputDiffVo(inputDiff);
     }
 
 
@@ -553,6 +612,7 @@ public class LoanUtil {
         private DepositRate fixedDepositRate; // 定期存款利率
         private Double inflationRate; // 通货膨胀率
     }
+
     @Data
     static class InputDiffVo implements Serializable {
         private static final long serialVersionUID = -8093507880643356418L;
@@ -739,6 +799,9 @@ public class LoanUtil {
         }
     }
 
+    /**
+     * TODO 存款利率定义
+     */
     enum DepositRate {
         DEMAND_DEPOSIT(0, 0.005),
         FIXED_DEPOSIT_1(1, 0.01),
