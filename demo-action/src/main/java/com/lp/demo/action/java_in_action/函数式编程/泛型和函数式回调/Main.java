@@ -1,4 +1,4 @@
-package com.lp.demo.action.java_in_action.泛型和函数式回调;
+package com.lp.demo.action.java_in_action.函数式编程.泛型和函数式回调;
 
 import java.util.ArrayList;
 import java.util.List;

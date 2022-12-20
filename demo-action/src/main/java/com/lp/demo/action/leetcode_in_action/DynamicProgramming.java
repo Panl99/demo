@@ -29,8 +29,18 @@ public class DynamicProgramming {
             System.out.print(temp);
         }
 
+        int n = scanner.nextInt();
+
         //斐波那切数列第n项
-        System.out.println(fibonacci(scanner.nextInt()));
+        long fibonacci = fibonacci(n);
+        System.out.println("fibonacci = " + fibonacci);
+
+        // 递归实现
+        int jumpFloorByRecursion = jumpFloorByRecursion(n);
+        System.out.println("jumpFloorByRecursion = " + jumpFloorByRecursion);
+        // 迭代实现
+        int jumpFloorByIteration = jumpFloorByIteration(n);
+        System.out.println("jumpFloorByIteration = " + jumpFloorByIteration);
     }
     /**
      * 标签：动态规划
@@ -231,5 +241,41 @@ public class DynamicProgramming {
      *      因此，n级台阶跳法数和为：f(n) = f(n-1) + f(n-2)
      *      实质上就是上边的斐波那切数列了
      */
+    // 递归实现
+    public static int jumpFloorByRecursion(int n) {
+        if (n <= 0) {
+            return 0;
+        }
+        if (n == 1) {
+            return 1;
+        }
+        if (n == 2) {
+            return 2;
+        }
+        return jumpFloorByRecursion(n - 1) + jumpFloorByRecursion(n - 2);
+    }
+
+    // 迭代实现
+    public static int jumpFloorByIteration(int n) {
+        if (n <= 0) {
+            return 0;
+        }
+        if (n == 1) {
+            return 1;
+        }
+        if (n == 2) {
+            return 2;
+        }
+        int f1 = 1;
+        int f2 = 2;
+        int result = 0;
+        for (int i = 3; i <= n; i++) {
+            result = f1 + f2;
+            f1 = f2;
+            f2 = result;
+        }
+        return result;
+    }
+
 
 }

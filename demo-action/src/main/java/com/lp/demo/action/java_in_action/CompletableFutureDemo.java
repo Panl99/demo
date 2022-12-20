@@ -2,6 +2,7 @@ package com.lp.demo.action.java_in_action;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  **/
 
 public class CompletableFutureDemo {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         testThenApply();
         testSupplyAsync();
         testRunAsync();
@@ -32,7 +33,7 @@ public class CompletableFutureDemo {
      * testThenApply
      * thenApply 当前阶段执行完后，结果作为下一阶段的参数。
      */
-    public static void testThenApply() throws Exception {
+    public static void testThenApply() {
         CompletableFuture future = CompletableFuture.supplyAsync(() -> 1)
                 .thenApply(i -> ++i)
                 .thenApply(i -> i << 2)
@@ -41,19 +42,27 @@ public class CompletableFutureDemo {
                     e.printStackTrace();
                     return null;
                 });
-        future.get();
+        try {
+            future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * supplyAsync 有返回值,没有指定Executor的方法会使用ForkJoinPool.commonPool() 作为它的线程池执行异步代码
      * runAsync 没有返回值
      */
-    public static void testSupplyAsync() throws Exception{
+    public static void testSupplyAsync() {
         CompletableFuture future = CompletableFuture.supplyAsync(() -> 100 >> 2)
                 .thenApplyAsync(i -> i * 10);
-        System.out.println("testSupplyAsync..." + future.get());
+        try {
+            System.out.println("testSupplyAsync..." + future.get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
-    public static void testRunAsync() throws Exception {
+    public static void testRunAsync() {
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             try {
                 TimeUnit.SECONDS.sleep(3);
@@ -61,14 +70,19 @@ public class CompletableFutureDemo {
             }
             System.out.println("testRunAsync end ...");
         });
-        System.out.println("testRunAsync..." + future.get());
+
+        try {
+            System.out.println("testRunAsync..." + future.get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * testWhenComplete
      * whenComplete 当前任务线程执行后，如果该线程执行慢没有立即返回结果时，使用whenComplete等待获取处理执行完后的结果，不会像使用get()一样阻塞住线程
      */
-    public static void testWhenComplete() throws Exception {
+    public static void testWhenComplete() {
         CompletableFuture.runAsync(() -> {
             try {
                 TimeUnit.SECONDS.sleep(1);
@@ -85,14 +99,18 @@ public class CompletableFutureDemo {
                     return null;
                 });
 
-        TimeUnit.SECONDS.sleep(2);
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * testThenAccept
      * thenAccept 接收任务结果（上个任务结果会传过来），并消费，无返回值
      */
-    public static void testThenAccept() throws Exception {
+    public static void testThenAccept() {
         CompletableFuture.supplyAsync(() -> "testThenAccept...")
                 .thenAccept(System.out::println);
     }
@@ -101,7 +119,7 @@ public class CompletableFutureDemo {
      * testThenRun
      * thenRun 不接受任务结果（上个任务结果不会传过来），只是在上个任务执行完成后执行thenRun方法
      */
-    public static void testThenRun() throws Exception {
+    public static void testThenRun() {
         CompletableFuture.supplyAsync(() -> 100)
                 .thenRun(() -> System.out.println("testThenRun..."));
     }
