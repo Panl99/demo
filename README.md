@@ -18,10 +18,10 @@
   - [demo-auth](#demo-auth)
   - [demo-xxljob](#demo-xxljob)  
   - [demo-api](#demo-api)
-  - [demo-action](#demo-action)
   - [demo-spi](#demo-spi)
   - [demo-reactor](#demo-reactor)
   - [demo-spring](#demo-spring)
+  - [demo-ddd](#demo-ddd)
 - [技术选型](#技术选型)
 - [端口规划](#端口规划)
 - [开发工具](#开发工具)
@@ -135,13 +135,14 @@ iot相关
 
 ## demo-api
 
-## demo-action
-
 ## demo-spi
 
 ## demo-reactor
 
 ## demo-spring
+
+## demo-ddd
+领域驱动设计Demo
 
 
 [目录](#目录)

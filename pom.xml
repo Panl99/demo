@@ -36,6 +36,7 @@
         <module>demo-spi</module>
         <module>demo-reactor</module>
         <module>demo-spring</module>
+        <module>demo-ddd</module>
     </modules>
 
     <properties>
