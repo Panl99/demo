@@ -37,6 +37,7 @@
         <module>demo-reactor</module>
         <module>demo-spring</module>
         <module>demo-ddd</module>
+        <module>demo-mqtt-broker</module>
     </modules>
 
     <properties>
