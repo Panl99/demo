@@ -1,137 +1,132 @@
 package com.lp.demo.common.aop.aspect;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.lp.demo.common.aop.annotation.MaskLog;
-import com.lp.demo.common.aop.annotation.SaveLog;
-import com.lp.demo.common.aop.service.OperationLogService;
-import com.lp.demo.common.util.ConsoleColorUtil;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
+import org.apache.commons.lang.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+
 
 /**
- * 使用@SaveLog添加日志
+ * WEB输入输出日志统一处理类
  */
-@Slf4j
 @Aspect
 @Component
+@Slf4j
 public class WebLogAspect {
 
-    @Autowired
-    OperationLogService operationLogService;
-
-    // 切入点
-    @Pointcut("@annotation(com.lp.demo.common.aop.annotation.SaveLog)")
-    public void saveLogPointcut() {
+    @Pointcut("@annotation(com.lp.demo.common.annotation.WebLog)")
+    public void webLog() {
     }
 
-    // 在切入点的方法环绕执行
-    @Around("@annotation(saveLog)")
-    public Object logBeforeController(JoinPoint joinPoint, SaveLog saveLog) throws Throwable {
-        Object result = null;
+    @Around(value = "webLog()")
+    public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        // 获取执行方法的类的名称（包名加类名）
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+        // 获取实例和方法
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
 
-        // 这个RequestContextHolder是Springmvc提供来获得请求的东西
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        // 获取远程调用信息
-        String remoteAddress = request.getRemoteAddr() + ":" + request.getRemotePort();
-        // 获取场景值
-        String scene = saveLog.scene();
-        // 掩码 saveLog
-        Map<Integer, Set<String>> masks = maskMap(saveLog.masks());
-        // 获取操作用户
-//        Object obj = new ThreadLocal<>().get();
-//        ConsoleColorUtil.printDefaultColor(String.valueOf(obj));
-        Long userId = 0L;
-        String operator = "lp";
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
 
-        Object[] args = joinPoint.getArgs();
+        String requestId = request.getHeader(ConstantHeaderUtil.REQUEST_ID);
+        StringBuilder builder = new StringBuilder();
 
-        // 处理入参
-        String requestBody = "";
-        String[] params = saveLog.params();
-        int[] indexes = saveLog.paramsIdxes();
-        if (ArrayUtil.isNotEmpty(params) && ArrayUtil.isNotEmpty(indexes) && params.length == indexes.length) {
-            Map<String, Object> reqMap = new HashMap<>();
-            for (int i = 0; i < indexes.length; i++) {
-                int idx = indexes[i];
-                String reqName = params[i];
-                Object param = args[idx];
-                Set<String> fds = masks.get(idx);
-                if (param == null) {
-                    reqMap.put(reqName, "");
-                } else if (param instanceof ServletRequest || param instanceof ServletResponse) {
-                    reqMap.put(reqName, "");
-                } else if (ObjectUtil.isEmpty(masks) || !masks.containsKey(idx)) {
-                    reqMap.put(reqName, param);
-                } else if (fds == null || fds.isEmpty()) {
-                    reqMap.put(reqName, "***");
-                } else {
-                    String reqStr = JSONUtil.toJsonStr(param);
-                    JSONObject jsonObject = JSONUtil.parseObj(reqStr);
-                    if (jsonObject.isEmpty()) {
-                        reqMap.put(reqName, "");
-                        continue;
-                    }
-                    for (String fd : fds) {
-//                        jsonObject.addProperty(fd, "***");
-                        jsonObject.putOpt(fd, "***");
-                    }
-                    reqMap.put(reqName, JSONUtil.toJsonStr(jsonObject));
-                }
-            }
-            requestBody = JSONUtil.toJsonStr(reqMap);
-        }
-
+        Parameter[] parameters = method.getParameters();
+        Object[] arguments = joinPoint.getArgs();
+        int i = 0;
         try {
-            MethodInvocationProceedingJoinPoint mjoinpoint = (MethodInvocationProceedingJoinPoint) joinPoint;
-            result = mjoinpoint.proceed(args);
-            String res = result == null ? "" : JSONUtil.toJsonStr(result);
-            operationLogService.saveLogWithBackground(userId, operator, scene, requestBody, res, remoteAddress);
-        } catch (Throwable throwable) {
-            throw throwable;
-        }
-        return result;
-    }
-
-    private Map<Integer, Set<String>> maskMap(MaskLog[] masks) {
-        if (masks == null || masks.length <= 0) {
-            return new HashMap<>(0);
-        } else {
-            Map<Integer, Set<String>> map = new HashMap<>();
-            for (MaskLog mask : masks) {
-                Set<String> fields = map.get(mask.paramsIdx());
-                if (fields == null) {
-                    fields = new HashSet<>();
-                    map.put(mask.paramsIdx(), fields);
-                }
-                String[] fds = mask.fields();
-                if (fds != null && fds.length > 0) {
-                    for (String fd : fds) {
-                        fields.add(fd);
+            if (parameters != null && arguments != null) {
+                for (; i < Math.min(parameters.length, arguments.length); i++) {
+                    if (arguments[i] instanceof HttpServletRequest) {
+                        appendRequestHeader(request, builder);
+                    }else if (arguments[i] instanceof HttpServletResponse){
+                        continue;
+                    }else if (arguments[i] instanceof MultipartFile){
+                        builder.append(parameters[i].getName()).append("=").append(((MultipartFile)arguments[i]).getOriginalFilename()).append(",");
+                    }else {
+                        builder.append(parameters[i].getName()).append("=").append(JSON.toJSONString(arguments[i])).append(",");
                     }
                 }
             }
-            return map;
+            if (builder.length() > 0) {
+                builder.deleteCharAt(builder.length() - 1);
+            }
+            log.info("{}.{} request:{},{}", className, method.getName(), requestId, builder.toString());
+        }catch (Exception e){
+            log.info("{}.{} request:{},参数{}无法被读取", className, method.getName(), requestId, parameters[i]);
         }
+
+        //执行方法获取返回值
+        Object proceed = joinPoint.proceed();
+        //打印返回值参数
+        log.info("{}.{} response:{},{}", className,method.getName(),requestId, JSON.toJSONString(proceed));
+        // 返回
+        return proceed;
+    }
+
+    private void appendRequestHeader(HttpServletRequest request, StringBuilder builder) {
+        Field[] fields = ConstantHeaderUtil.class.getFields();
+        builder.append("requestHeader{");
+        boolean isEmpty = true;
+        try {
+            for (Field field : fields) {
+                String fieldName = String.valueOf(field.get(ConstantHeaderUtil.class));
+                String fieldValue = request.getHeader(fieldName);
+                if (StringUtils.isNotEmpty(fieldValue)) {
+                    builder.append(fieldName).append("=").append(fieldValue).append(",");
+                    isEmpty = false;
+                }
+            }
+        } catch (IllegalAccessException e) {
+            log.error("异常", e);
+        }
+
+        if (!isEmpty) {
+            builder.deleteCharAt(builder.length() - 1);
+        }
+        builder.append("},");
+    }
+
+    static class ConstantHeaderUtil {
+        public static final String REQUEST_ID = "X-Test-RequestId";
+        public static final String KEY_ID = "X-Test-KeyId";
+        public static final String SIGNATURE = "X-Test-Signature";
+        public static final String AUTHENTICATION = "Authentication";
+        public static final String TIME_STAMP = "Time-stamp";
+        public static final String DEVICE_TOKEN = "deviceToken";
+        public static final String LANGUAGE = "Accept-Language";
+        public static final String CLIENT_ID ="X-Test-ClientId";
+        public static final String AppVersion ="X-Test-AppVersion";
+
+        /**
+         * app info，格式:appid, version, name
+         */
+        public static final String APPINFO = "X-Test-AppInfo";
+        public static final String APP_ID ="X-Test-AppId";
+        public static final String PLATFORM ="X-Test-Platform";
+        public static final String TEMPORARY_TOKEN ="X-Test-TemporaryToken";
+        public static final String PHONE_MODEL ="Phone-Model";
+        public static final String ACCESS_KEY = "X-Test-AccessKey";
+        public static final String ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method";
+        public static final String ACCEPT_ENCODING= "X-Test-Accept-Encoding";
+        public static final String CONTENT_ENCODING= "X-Test-Content-Encoding";
+        public static final String JWT_TOKEN= "X-Test-JwtToken";
+        public static final String WECHAT_APP_ID = "X-Wechat-AppId";
+        public static final String DDING_APP_ID = "X-DDing-AppId";
     }
 }
