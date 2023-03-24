@@ -25,7 +25,7 @@
         <embedded-pulsar.version>0.0.2</embedded-pulsar.version>
         <guava.version>31.1-jre</guava.version>
         <jackson.version>2.14.1</jackson.version>
-        <junit.version>5.9.2</junit.version>
+        <junit-jupiter.version>5.9.2</junit-jupiter.version>
         <kafka.version>3.1.1</kafka.version>
         <log4j.version>2.19.0</log4j.version>
         <mockito.version>4.11.0</mockito.version>
@@ -120,7 +120,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
