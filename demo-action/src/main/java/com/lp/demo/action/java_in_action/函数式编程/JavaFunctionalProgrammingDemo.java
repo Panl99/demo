@@ -1,11 +1,13 @@
 package com.lp.demo.action.java_in_action.函数式编程;
 
 
+import com.google.common.collect.Lists;
 import com.lp.demo.common.util.ConsoleColorUtil;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -141,4 +143,34 @@ public class JavaFunctionalProgrammingDemo {
              */
         }
     }
+
+    /**
+     * 列表内容分批处理示例
+     * 类似：guava的Lists的partition
+     * 使用场景：批量导入
+     */
+    static class StreamSkipTest {
+        public static void main(String[] args) {
+            List<Integer> list = Arrays.asList(11,33,55,77,99,22,66,88);
+            int pageSize = 3; // 每次处理条数
+            int pages = (int) Math.ceil(list.size() * 1.0 / pageSize); // 计算要分几次处理
+
+            for (int i = 1; i <= pages; i++) {
+                List<Integer> collect = list.stream().skip((i - 1) * pageSize).limit(pageSize).collect(Collectors.toList());
+                System.out.println("collect-" + i +" = " + collect);
+            }
+
+            List<List<Integer>> partition = Lists.partition(list, pageSize);
+            System.out.println("partition = " + partition);
+            /**
+             * 结果：
+             * collect-1 = [11, 33, 55]
+             * collect-2 = [77, 99, 22]
+             * collect-3 = [66, 88]
+             *
+             * partition = [[11, 33, 55], [77, 99, 22], [66, 88]]
+             */
+        }
+    }
+
 }
