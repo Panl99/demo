@@ -13,7 +13,7 @@ import java.util.List;
  **/
 public class ExcelListener<T> extends AnalysisEventListener<T> {
 
-    private final List<Object> data = new ArrayList<>();
+    private final List<T> data = new ArrayList<>();
 
     @Override
     public void invoke(T t, AnalysisContext analysisContext) {
@@ -22,10 +22,10 @@ public class ExcelListener<T> extends AnalysisEventListener<T> {
 
     @Override
     public void doAfterAllAnalysed(AnalysisContext analysisContext) {
-
+        System.out.println("所有数据解析完成");
     }
 
-    public List<Object> getData() {
+    public List<T> getData() {
         return data;
     }
 

@@ -1,8 +1,12 @@
 package com.lp.demo.common.util.easyexcel;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelReader;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.lp.demo.common.annotation.WebLog;
 import com.lp.demo.common.exception.DisplayableException;
 import com.lp.demo.common.result.JsonResult;
 import com.lp.demo.common.result.ResultEnum;
@@ -15,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -97,6 +102,26 @@ public class EasyExcelUtilController {
         } catch (DisplayableException e) {
             log.info(""+e);
             return new JsonResult<>(ResultEnum.FAIL.getCode(), e.getMessage());
+        }
+    }
+
+    /**
+     * https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
+     * @param file
+     * @return
+     */
+    @WebLog
+    @PostMapping("/import")
+    public void importDevice(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new DisplayableException("文件不存在");
+        }
+        try {
+            List<ExportTestModel> data = ExcelUtil.readExcel(file.getInputStream(), ExportTestModel.class);
+            System.out.println("data = " + data);
+        } catch (DisplayableException | IOException e) {
+            log.info("Read excel error! ", e);
+            throw new DisplayableException(e.getMessage());
         }
     }
 }

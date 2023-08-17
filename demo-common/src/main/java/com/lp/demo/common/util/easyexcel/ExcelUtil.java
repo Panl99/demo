@@ -31,6 +31,23 @@ import java.util.List;
  * @desc
  **/
 public class ExcelUtil {
+
+    /**
+     *
+     * @param inputStream
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> readExcel(InputStream inputStream, Class<T> clazz) {
+        ExcelListener<T> listener = new ExcelListener<>();
+        try (ExcelReader excelReader = EasyExcel.read(inputStream, clazz, listener).build()) {
+            ReadSheet readSheet = EasyExcel.readSheet(0).build();
+            excelReader.read(readSheet);
+        }
+        return listener.getData();
+    }
+
     /**
      * 读取 Excel(多个 sheet)
      */
