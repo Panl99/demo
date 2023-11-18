@@ -1,0 +1,6 @@
+com\lp\demo\shardingsphere\jdbc\server\config\CorsConfig.class
+com\lp\demo\shardingsphere\jdbc\server\config\WebMvcConfig.class
+com\lp\demo\shardingsphere\jdbc\server\controller\TestController.class
+com\lp\demo\shardingsphere\jdbc\server\config\RedisConfig.class
+com\lp\demo\shardingsphere\jdbc\server\config\SwaggerConfig.class
+com\lp\demo\shardingsphere\jdbc\server\MainApplication.class

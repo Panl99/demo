@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lp.demo.shardingsphere.jdbc.domain.mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.lp.demo.shardingsphere.jdbc.domain.entity.Order">
+        <id column="id" property="id"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="region_code" property="regionCode"/>
+        <result column="amount" property="amount"/>
+        <result column="mobile" property="mobile"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="voResultMap" type="com.lp.demo.shardingsphere.jdbc.domain.vo.OrderVo">
+        <id column="id" property="id"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="region_code" property="regionCode"/>
+        <result column="amount" property="amount"/>
+        <result column="mobile" property="mobile"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="orderDetail" column="{orderId=id, tenantId=tenant_id}"
+                     javaType="com.lp.demo.shardingsphere.jdbc.domain.entity.OrderDetail"
+                     select="com.lp.demo.shardingsphere.jdbc.domain.mapper.OrderMapper.selectOrderDetail"
+        />
+        <collection property="orderItems" column="{orderId=id, tenantId=tenant_id}"
+                    ofType="com.lp.demo.shardingsphere.jdbc.domain.entity.OrderItem"
+                    select="com.lp.demo.shardingsphere.jdbc.domain.mapper.OrderMapper.selectOrderItems"
+        />
+    </resultMap>
+
+    <insert id="saveOrder" parameterType="com.lp.demo.shardingsphere.jdbc.domain.entity.Order">
+        insert into t_order
+        (id,
+         tenant_id,
+         region_code,
+         amount,
+         mobile,
+         create_time,
+         update_time)
+        values (#{id},
+                #{tenantId},
+                #{regionCode},
+                #{amount},
+                #{mobile},
+                now(),
+                now())
+    </insert>
+
+    <insert id="saveOrderDetail" parameterType="com.lp.demo.shardingsphere.jdbc.domain.entity.OrderDetail">
+        insert into t_order_detail
+        (id,
+         order_id,
+         tenant_id,
+         region_code,
+         address,
+         status,
+         create_time,
+         update_time)
+        values (#{id},
+                #{orderId},
+                #{tenantId},
+                #{regionCode},
+                #{address},
+                #{status},
+                now(),
+                now())
+    </insert>
+
+    <insert id="saveOrderItem" parameterType="com.lp.demo.shardingsphere.jdbc.domain.entity.OrderItem">
+        insert into t_order_item
+        (id,
+         tenant_id,
+         region_code,
+         good_id,
+         good_name,
+         order_id,
+         create_time,
+         update_time)
+        values (#{id},
+                #{tenantId},
+                #{regionCode},
+                #{goodId},
+                #{goodName},
+                #{orderId},
+                now(),
+                now())
+    </insert>
+
+    <select id="selectOrder" parameterType="java.lang.Long" resultMap="voResultMap">
+        select a.id,
+               a.tenant_id,
+               a.region_code,
+               a.amount,
+               a.mobile,
+               a.create_time,
+               a.update_time
+        FROM t_order a
+        where a.id = #{id}
+    </select>
+
+    <select id="selectOrderDetail" parameterType="map"
+            resultType="com.lp.demo.shardingsphere.jdbc.domain.entity.OrderDetail">
+        select od.id          id,
+               od.order_id    orderId,
+               od.tenant_id   tenantId,
+               od.address     address,
+               od.status      status,
+               od.region_code regionCode,
+               od.create_time createTime,
+               od.update_time updateTime
+        FROM t_order_detail od
+        where od.order_id = #{orderId}
+          and od.tenant_id = #{tenantId}
+    </select>
+
+    <select id="selectOrderItems" parameterType="map"
+            resultType="com.lp.demo.shardingsphere.jdbc.domain.entity.OrderItem">
+        select oi.id          id,
+               oi.order_id    orderId,
+               oi.tenant_id   tenantId,
+               oi.region_code regionCode,
+               oi.good_id     goodId,
+               oi.good_name   goodName,
+               oi.create_time createTime,
+               oi.update_time updateTime
+        FROM t_order_item oi
+        where oi.order_id = #{orderId}
+          and oi.tenant_id = #{tenantId}
+    </select>
+
+</mapper>

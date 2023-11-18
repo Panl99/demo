@@ -1,0 +1,5 @@
+com\lp\demo\shardingsphere\jdbc\domain\po\TEntOrderItem.class
+com\lp\demo\shardingsphere\jdbc\domain\po\TEntOrder.class
+com\lp\demo\shardingsphere\jdbc\domain\DemoShardingsphereJdbcDomainApplication.class
+com\lp\demo\shardingsphere\jdbc\domain\po\TEntOrderDetail.class
+com\lp\demo\shardingsphere\jdbc\domain\mapper\OrderMapper.class
