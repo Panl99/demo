@@ -20,6 +20,7 @@
         <module>demo-order-service</module>
         <module>demo-storage-service</module>
         <module>demo-business-service</module>
+        <module>demo-seata-fix_will_connect_to_xxx</module>
     </modules>
 
     <properties>
