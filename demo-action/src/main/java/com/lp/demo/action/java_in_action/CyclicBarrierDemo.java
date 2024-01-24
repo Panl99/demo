@@ -2,11 +2,14 @@ package com.lp.demo.action.java_in_action;
 
 import com.lp.demo.common.util.ConsoleColorUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -179,4 +182,68 @@ public class CyclicBarrierDemo {
             }
         }
     }
+
+    /**
+     * 统计数据接口
+     * 多线程查询数据 合并返回
+     *
+     * @param <T> 返回数据对象类型
+     * @return
+     */
+    // @Override
+    public <T> List<T> getStatisticsData() {
+        WorkerThread<T> workerThread = new WorkerThread<>();
+        return workerThread.getData();
+    }
+
+    class WorkerThread<T> {
+        private static final int THREAD_COUNT = 2;
+        private final List<T> dataOverview = new ArrayList<>();
+        private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT);
+        private final CyclicBarrier barrier = new CyclicBarrier(THREAD_COUNT + 1);
+
+        private List<T> getData() {
+            for (int i = 0; i < THREAD_COUNT; i++) {
+                int tid = i;
+                executorService.execute(() -> {
+                    switch (tid) {
+                        case 0:
+                            // 查询数据A
+                            dataOverview.add(getA());
+                            break;
+                        case 1:
+                            // 查询数据B
+                            dataOverview.add(getB());
+                            break;
+                        default:
+                            return;
+                    }
+
+                    try {
+                        barrier.await();
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        System.out.println("worker sub thread exception, e: " + e);
+                        barrier.reset();
+                    }
+                });
+            }
+            try {
+                barrier.await();
+            } catch (InterruptedException | BrokenBarrierException e) {
+                System.out.println("worker main thread exception, e: " + e);
+                barrier.reset();
+            }
+            executorService.shutdown();
+            return dataOverview;
+        }
+
+        // 具体查询方法
+        private T getA() {
+            return null;
+        }
+        private T getB() {
+            return null;
+        }
+    }
+
 }
