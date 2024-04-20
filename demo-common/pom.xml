@@ -27,6 +27,7 @@
         <reflectasm.version>1.11.9</reflectasm.version>
         <aliyun-oss.version>3.14.0</aliyun-oss.version>
         <pdfbox.version>3.0.2</pdfbox.version>
+        <jexl.version>3.3</jexl.version>
     </properties>
 
     <dependencies>
@@ -181,6 +182,12 @@
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>${pdfbox.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jexl3</artifactId>
+            <version>${jexl.version}</version>
         </dependency>
 
         <dependency>
