@@ -28,6 +28,7 @@
         <aliyun-oss.version>3.14.0</aliyun-oss.version>
         <pdfbox.version>3.0.2</pdfbox.version>
         <jexl.version>3.3</jexl.version>
+        <knife4j.version>2.0.9</knife4j.version>
     </properties>
 
     <dependencies>
@@ -188,6 +189,13 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-jexl3</artifactId>
             <version>${jexl.version}</version>
+        </dependency>
+
+        <!--knife4j-->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>${knife4j.version}</version>
         </dependency>
 
         <dependency>
