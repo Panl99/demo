@@ -2,6 +2,9 @@ package com.lp.demo.common.util;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Tuple;
+import com.lp.demo.common.exception.DisplayableException;
+import com.lp.demo.common.result.BaseEnum;
+import com.lp.demo.common.result.ResultEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +25,7 @@ public class BatchUtil {
         if (CollectionUtil.isEmpty(list)) {
             return;
         }
-        int index = 0;
-        while (list.size() > index + NUM){
-            List<T> subList = list.subList(index, index + NUM);
-            c.accept(subList);
-            index += NUM;
-        }
-        List<T> subList = list.subList(index, list.size());
-        if (subList.size() > 0) {
-            c.accept(subList);
-        }
+        invoke(c, list, NUM);
     }
 
 
@@ -47,5 +41,53 @@ public class BatchUtil {
          * [[6, false], [7, false], [8, false]]
          * [[9, false]]
          */
+
+        invoke(System.out::println, null, ResultEnum.FAIL);
+    }
+
+//    public static <T> void invoke(Consumer<List<T>> c, List<T> list) {
+//        invoke(c, list, NUM);
+//    }
+
+    public static <T> void invoke(Consumer<List<T>> c, List<T> list, BaseEnum baseEnum) {
+        invoke(c, list, NUM, baseEnum);
+    }
+
+    public static <T> void invoke(Consumer<List<T>> c, List<T> list, Integer code, String message) {
+        invoke(c, list, NUM, code, message);
+    }
+
+    public static <T> void invoke(Consumer<List<T>> c, List<T> list, int count) {
+        if (CollectionUtil.isEmpty(list)) {
+            return;
+        }
+        accept(c, list, count);
+    }
+
+    public static <T> void invoke(Consumer<List<T>> c, List<T> list, int count, BaseEnum baseEnum) {
+        if (CollectionUtil.isEmpty(list)) {
+            throw new DisplayableException(baseEnum);
+        }
+        accept(c, list, count);
+    }
+
+    public static <T> void invoke(Consumer<List<T>> c, List<T> list, int count, Integer code, String message) {
+        if (CollectionUtil.isEmpty(list)) {
+            throw new DisplayableException(code, message);
+        }
+        accept(c, list, count);
+    }
+
+    private static <T> void accept(Consumer<List<T>> c, List<T> list, int count) {
+        int index = 0;
+        while (list.size() > index + count){
+            List<T> subList = list.subList(index, index + count);
+            c.accept(subList);
+            index += count;
+        }
+        List<T> subList = list.subList(index, list.size());
+        if (subList.size() > 0) {
+            c.accept(subList);
+        }
     }
 }
