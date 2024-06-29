@@ -52,7 +52,8 @@ public class UserController {
             paramsIdxes = {0},
             params = {"user"},
             masks = @MaskLog(paramsIdx = 0,
-                    fields = "phoneNumber"
+                    fields = "phoneNumber",
+                    maskLevel = MaskLog.MaskLevelEnum.PART
             )
     )
     @PutMapping({"update"})

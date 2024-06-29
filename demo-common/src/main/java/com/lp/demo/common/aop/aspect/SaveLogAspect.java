@@ -2,14 +2,17 @@ package com.lp.demo.common.aop.aspect;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.lp.demo.common.aop.annotation.MaskLog;
 import com.lp.demo.common.aop.annotation.SaveLog;
 import com.lp.demo.common.aop.service.OperationLogService;
 import com.lp.demo.common.util.ConsoleColorUtil;
+import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -23,6 +26,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -133,5 +137,100 @@ public class SaveLogAspect {
             }
             return map;
         }
+    }
+
+
+
+
+
+
+
+//    @SaveOperationLog(
+//            scene = "测试测试",
+//            paramsIdxes = {0, 1},
+//            params = {"param1", "param2"},
+//            masks = {@MaskLog(paramsIdx = 0,
+//                    fields = {"name", "id", "phone"},
+//                    maskLevel = MaskLog.MaskLevelEnum.PART),
+//                    @MaskLog(paramsIdx = 1,
+//                            fields = {"f2"},
+//                            maskLevel = MaskLog.MaskLevelEnum.PART)
+//            }
+//    )
+
+    @Around("@annotation(operationLog)")
+    public Object logBefore(ProceedingJoinPoint joinPoint, SaveLog operationLog) throws Throwable {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+        String remoteAddress = "";
+        if (StringUtil.isEmpty(remoteAddress)) {
+            remoteAddress = request.getRemoteAddr();
+        }
+        String scene = operationLog.scene();
+        MaskLog[] masks = operationLog.masks();
+        Object[] args = joinPoint.getArgs();
+        // 处理入参
+        String requestBody = "";
+        String[] params = operationLog.params();
+        int[] indexes = operationLog.paramsIdxes();
+        if (ArrayUtil.isNotEmpty(params) && ArrayUtil.isNotEmpty(indexes) && params.length == indexes.length) {
+            Map<String, Object> reqMap = new HashMap<>();
+            for (int i = 0; i < indexes.length; i++) {
+                int idx = indexes[i];
+                String reqName = params[i];
+                Object param = args[idx];
+
+                if (param == null) {
+                    reqMap.put(reqName, "");
+                } else if (param instanceof ServletRequest || param instanceof ServletResponse) {
+                    reqMap.put(reqName, "");
+                } else if (ObjectUtil.isEmpty(masks) || Arrays.stream(masks).map(MaskLog::paramsIdx).noneMatch(k -> k == idx)) {
+                    reqMap.put(reqName, param);
+                } else {
+                    MaskLog mask = masks[idx];
+                    MaskLog.MaskLevelEnum maskLevel = mask.maskLevel();
+                    if (param instanceof Map) {
+                        String reqStr = JSONUtil.toJsonStr(param);
+                        JSONObject jsonObject = JSONUtil.parseObj(reqStr);
+                        if (jsonObject.isEmpty()) {
+                            reqMap.put(reqName, "");
+                            continue;
+                        }
+
+                        for (String fd : mask.fields()) {
+                            String s = jsonObject.get(fd).toString();
+                            jsonObject.putOpt(fd, this.mask(s, maskLevel));
+                        }
+                        reqMap.put(reqName, jsonObject);
+                    } else {
+                        reqMap.put(reqName, this.mask(param.toString(), maskLevel));
+                    }
+
+                }
+            }
+            requestBody = JSONUtil.toJsonStr(reqMap);
+        } else if (args != null && args.length > 0) {
+            JSONObject jsonObject = new JSONObject();
+            for (int i = 0; i < args.length; i++) {
+                jsonObject.set("参数"+ i, args[i]);
+            }
+            requestBody = JSONUtil.toJsonStr(jsonObject);
+        }
+
+        System.out.println("requestBody = " + requestBody);
+
+        MethodInvocationProceedingJoinPoint mjoinpoint = (MethodInvocationProceedingJoinPoint) joinPoint;
+        Object result = mjoinpoint.proceed(args);
+
+        System.out.println("result = " + result);
+
+        return result;
+    }
+
+    private Object mask(String s, MaskLog.MaskLevelEnum maskLevel) {
+        return maskLevel == MaskLog.MaskLevelEnum.ALL ? "******" :
+                s.length() > 4 ? StrUtil.hide(s, 2, s.length() - 2) :
+                        s.length() <= 0 ? "***" :
+                                s.charAt(0) + "***" + s.charAt(s.length() - 1);
     }
 }

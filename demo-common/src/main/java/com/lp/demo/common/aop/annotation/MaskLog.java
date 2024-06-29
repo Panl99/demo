@@ -10,4 +10,13 @@ public @interface MaskLog {
 
     // 参数位置对应对象的字段， 如果字段为空，此时整个参数以掩码形式打印，否则，对应的字段以掩码形式展现
     String[] fields() default {};
+
+    /**
+     * 掩码程度
+     */
+    MaskLevelEnum maskLevel();
+
+    enum MaskLevelEnum {
+        ALL, PART
+    }
 }
