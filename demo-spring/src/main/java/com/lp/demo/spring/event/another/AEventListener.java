@@ -12,8 +12,8 @@ import java.util.List;
 public class AEventListener {
 
 
-    @EventListener(value = {Event.class}, condition = "#root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).A")
-    public void onApplicationEvent(Event<AEvent> event) {
+    @EventListener(value = {AEvent.class}, condition = "#root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).A")
+    public void onApplicationEvent(AEvent event) {
         ConsoleColorUtil.printDefaultColor("receive A void event = " + event + event.getTimestamp());
     }
 
@@ -23,12 +23,12 @@ public class AEventListener {
      * @param event 接收事件A
      * @return
      */
-    @EventListener(condition = "#root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).A")
-    public Event<BEvent> onApplicationEvent4Resp(Event<AEvent> event) {
+    @EventListener(condition = "#root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).A")
+    public BEvent onApplicationEvent4Resp(AEvent event) {
         ConsoleColorUtil.printDefaultColor("receive A response BEvent event = " + event + event.getTimestamp());
-        BEvent bEvent = new BEvent();
+        BEvent bEvent = new BEvent(EventTypeEnum.B);
         bEvent.setName("A -> bEvent " + bEvent.getName());
-        return new Event<>(this, EventTypeEnum.B, bEvent);
+        return bEvent;
     }
 
     /**
@@ -37,18 +37,17 @@ public class AEventListener {
      * @param event 接收事件A、C
      * @return
      */
-    @EventListener(condition = "#root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).A " +
-            "|| #root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).C")
-    public List<Event<BEvent>> onApplicationEvent4RespArray(Event<AEvent> event) {
+    @EventListener(condition = "#root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).A " +
+            "|| #root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).C")
+    public List<BEvent> onApplicationEvent4RespArray(AEvent event) {
         ConsoleColorUtil.printDefaultColor("receive A response List<BEvent> event = " + event + event.getTimestamp());
-        BEvent bEvent = new BEvent();
+        BEvent bEvent = new BEvent(EventTypeEnum.B);
         bEvent.setName("A -> bEvent1 " + bEvent.getName());
 
-        BEvent bEvent2 = new BEvent();
-        bEvent2.setName("A -> bEvent2 " + bEvent.getName());
+        BEvent bEvent2 = new BEvent(EventTypeEnum.D);
+        bEvent2.setName("A -> bEvent2 " + bEvent2.getName());
 
-        return Arrays.asList(new Event<>(this, EventTypeEnum.B, bEvent),
-                new Event<>(this, EventTypeEnum.D, bEvent2));
+        return Arrays.asList(bEvent, bEvent2);
     }
 
 }

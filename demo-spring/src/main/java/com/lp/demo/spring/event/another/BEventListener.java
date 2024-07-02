@@ -10,22 +10,22 @@ import org.springframework.stereotype.Component;
 public class BEventListener {
 
     @Async("eventExecutor")
-    @EventListener(condition = "#root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).B")
-    public void onApplicationEvent(Event<BEvent> event) {
+    @EventListener(condition = "#root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).B")
+    public void onApplicationEvent(BEvent event) {
         ConsoleColorUtil.printDefaultColor("receive B event = " + event + event.getTimestamp());
     }
 
 
     @Async("eventExecutor")
-    @EventListener(value = {Event.class}, condition = "#root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).B" +
-            "|| #root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).D")
-    public void onApplicationEvent2(Event<BEvent> event) {
+    @EventListener(value = {Event.class}, condition = "#root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).B" +
+            "|| #root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).D")
+    public void onApplicationEvent2(BEvent event) {
         ConsoleColorUtil.printDefaultColor("receive B+D event = " + event + event.getTimestamp());
     }
 
     @Async("eventExecutor")
-    @EventListener(value = {Event.class}, condition = "#root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).D")
-    public void onApplicationEvent3(Event<BEvent> event) {
+    @EventListener(value = {BEvent.class}, condition = "#root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).D")
+    public void onApplicationEvent3(BEvent event) {
         ConsoleColorUtil.printDefaultColor("receive D event = " + event + event.getTimestamp());
     }
 
@@ -37,13 +37,13 @@ public class BEventListener {
      * @param event
      * @return
      */
-//    @Async("eventExecutor")
-//    @EventListener(value = {Event.class}, condition = "#root.event.eventType == T(com.lp.demo.spring.event.another.EventTypeEnum).D")
-//    public Event<BEvent> onApplicationEvent4(Event<BEvent> event) {
+////    @Async("eventExecutor")
+//    @EventListener(value = {BEvent.class}, condition = "#root.event.source == T(com.lp.demo.spring.event.another.EventTypeEnum).D")
+//    public BEvent onApplicationEvent4(BEvent event) {
 //        ConsoleColorUtil.printDefaultColor("receive D response event = " + event + event.getTimestamp());
-//        BEvent bEvent = new BEvent();
-//        bEvent.setName("D -> bEvent " + bEvent.getName());
-//        return new Event<>(this, EventTypeEnum.D, bEvent);
+//        BEvent bEvent = new BEvent(EventTypeEnum.D);
+//        bEvent.setName("D -> dEvent " + bEvent.getName());
+//        return bEvent;
 //    }
 
 

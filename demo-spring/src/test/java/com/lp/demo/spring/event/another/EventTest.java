@@ -16,25 +16,25 @@ class EventTest {
 
     @Test
     void publishAEvent() {
-        Event<AEvent> event = new Event<>(this, EventTypeEnum.A, new AEvent());
+        AEvent event = new AEvent(EventTypeEnum.A);
         EventPublisher.publish(event);
     }
 
     @Test
     void publishBEvent() {
-        Event<BEvent> event = new Event<>(this, EventTypeEnum.B, new BEvent());
+        BEvent event = new BEvent(EventTypeEnum.B);
         EventPublisher.publish(event);
     }
 
     @Test
     void publishCEvent() {
-        Event<AEvent> event = new Event<>(this, EventTypeEnum.C, new AEvent());
+        AEvent event = new AEvent(EventTypeEnum.C);
         EventPublisher.publish(event);
     }
 
     @Test
     void publishDEvent() {
-        Event<BEvent> event = new Event<>(this, EventTypeEnum.D, new BEvent());
+        BEvent event = new BEvent(EventTypeEnum.D);
         EventPublisher.publish(event);
     }
 

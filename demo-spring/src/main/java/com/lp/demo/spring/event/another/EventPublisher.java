@@ -14,7 +14,7 @@ public class EventPublisher {
         EventPublisher.applicationEventPublisher = applicationEventPublisher;
     }
 
-    public static <T> void publish(Event<T> event) {
+    public static <T extends Event> void publish(T event) {
         applicationEventPublisher.publishEvent(event);
     }
 }

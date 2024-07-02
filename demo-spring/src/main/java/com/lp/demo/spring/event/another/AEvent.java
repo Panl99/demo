@@ -1,13 +1,15 @@
 package com.lp.demo.spring.event.another;
 
 
-public class AEvent {
+public class AEvent extends Event {
 
     private static final long serialVersionUID = -8806838352922851813L;
 
-    private String name = this.getClass().getSimpleName();
+    private String name;
 
-    public AEvent() {
+    public AEvent(Object source) {
+        super(source);
+        this.name = this.getClass().getSimpleName();
     }
 
     public String getName() {
@@ -22,6 +24,6 @@ public class AEvent {
     public String toString() {
         return "AEvent{" +
                 "name='" + name + '\'' +
-                '}';
+                "} " + super.toString();
     }
 }

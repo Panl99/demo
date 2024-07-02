@@ -2,49 +2,34 @@ package com.lp.demo.spring.event.another;
 
 import org.springframework.context.ApplicationEvent;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author lp
  * @date 2023/8/23 11:33
  * @desc 抽象事件类
  **/
-public class Event<T> extends ApplicationEvent {
+public class Event extends ApplicationEvent {
 
     private static final long serialVersionUID = -7350407582134152264L;
-    /**
-     * 系统类型
-     */
-    private EventTypeEnum eventType;
 
-    private T data;
+    private static final AtomicInteger AI = new AtomicInteger();
 
-    public Event(Object source, EventTypeEnum eventType, T data) {
+    private final int sn;
+
+    public Event(Object source) {
         super(source);
-        this.eventType = eventType;
-        this.data = data;
+        this.sn = AI.incrementAndGet();
     }
 
-    public T getData() {
-        return data;
-    }
-
-    public Event<T> setData(T data) {
-        this.data = data;
-        return this;
-    }
-
-    public EventTypeEnum getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(EventTypeEnum eventType) {
-        this.eventType = eventType;
+    public int getSn() {
+        return sn;
     }
 
     @Override
     public String toString() {
         return "Event{" +
-                "eventType=" + eventType +
-                ", data=" + data +
+                ", sn=" + sn +
                 ", source=" + source +
                 '}';
     }
