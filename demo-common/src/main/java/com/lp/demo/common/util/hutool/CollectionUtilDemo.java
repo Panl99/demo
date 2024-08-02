@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -328,6 +330,16 @@ public class CollectionUtilDemo {
             System.out.println(" ----------------------------Map test3-------------------------- ");
             test3();
             System.out.println(" ----------------------------Map test4-------------------------- ");
+            test4();
+            System.out.println(" ----------------------------Map test5-------------------------- ");
+            test5();
+            System.out.println(" ----------------------------Map test6-------------------------- ");
+            test6();
+
+            System.out.println(" ----------------------------Map test8-------------------------- ");
+            test8();
+
+
 
         }
 
@@ -384,6 +396,260 @@ public class CollectionUtilDemo {
             System.out.println(JSONObject.parseObject(JSONObject.toJSONString(groupedMap)));
             // {"1":{"A":["apple","apricot"],"B":["banana","blueberry"],"C":["cherry"]},"2":{"B":["bean","beet"],"C":["carrot","cabbage","corn"]}}
         }
+
+        // Map<Integer, Long> 转为 Map<Integer, Double>, 对value计算比值
+        public static void test4() {
+            Map<Integer, Long> map = new HashMap<>();
+            map.put(2, 200L);
+            map.put(1, 100L);
+            map.put(3, 300L);
+            map.put(44, 400L);
+
+            long totalSum = map.values().stream().mapToLong(Long::longValue).sum();
+            Map<Integer, Double> ratioMap = map.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey(Comparator.naturalOrder()))
+                    .collect(HashMap::new,
+                            (m, e) -> m.put(e.getKey(), Double.parseDouble(String.format("%.4f", (double) e.getValue() / totalSum))),
+                            Map::putAll);
+            System.out.println(JSONObject.parseObject(JSONObject.toJSONString(ratioMap)));
+//            // {"1":0.1667,"2":0.3333,"3":0.5}
+
+            // 前几项的累加和
+            Set<Integer> keySet = map.keySet();
+//            keySet.remove(44);
+            Map<Integer, Double> resultMap = new HashMap<>();
+            for (Integer i : keySet) {
+                long sum = map.entrySet().stream()
+                        .filter(m -> m.getKey() <= i)
+                        .map(Map.Entry::getValue)
+                        .mapToLong(Long::longValue)
+                        .sum();
+                resultMap.put(i, Double.parseDouble(String.format("%.4f", (double) sum / totalSum)));
+            }
+            System.out.println(JSONObject.parseObject(JSONObject.toJSONString(resultMap)));
+            // {"44":1.0,"1":0.1,"2":0.3,"3":0.6}
+        }
+
+        // 遍历最外层的Map，并对内层Map中相同键值的Integer项求平均值，然后将结果转换为一个新的Map。
+        public static void test5() {
+            Map<String, Map<Integer, Double>> originalMap = new HashMap<>();
+            originalMap.put("aaa", new HashMap<Integer, Double>(){{
+                put(0, 0.3);
+                put(1, 0.4);
+                put(2, 0.5);
+                put(3, 0.6);
+            }});
+            originalMap.put("bbb", new HashMap<Integer, Double>(){{
+                put(0, 0.4);
+                put(1, 0.5);
+                put(2, 0.6);
+                put(3, 0.7);
+            }});
+
+            Map<Integer, Double> averagedMap = originalMap.values().stream()
+                    .flatMap(innerMap -> innerMap.entrySet().stream())
+                    .collect(Collectors.groupingBy(
+                            Map.Entry::getKey,
+                            Collectors.averagingDouble(Map.Entry::getValue) //(v -> Double.parseDouble(String.format("%.4f", v.getValue())))
+                    )) //;
+                    // 保留4位小数
+            .entrySet().stream().collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            v -> Double.parseDouble(String.format("%.4f", v.getValue()))
+                    ));
+
+
+            System.out.println(JSONObject.parseObject(JSONObject.toJSONString(averagedMap)));
+            // {"0":0.35,"1":0.45,"2":0.55,"3":0.65}
+        }
+
+
+        /**
+         * 对每个 Map<Long, Map<String, Map<Integer, Double>>> 的内层 Map<Integer, Double> 的 Double 值求和，并根据求和结果进行排序，同时处理求和值相同的情况
+         *
+         * 1.过滤并合并 Map<String, Map<Integer, Double>> 到一个 Map<Integer, Double>。
+         * 2.对每个 Map<Integer, Double> 的 Double 值求和。
+         * 3.对求和结果进行排序，如果求和值相同，排序为平等序号。
+         * 4.将结果转换为 Map<Long, Integer>，其中 Integer 值表示序号。
+         */
+        public static void test6() {
+            // 假设原始数据如下
+            Map<Long, Map<String, Map<Integer, Double>>> originalMap = new HashMap<>();
+
+            // 填充示例数据
+            Map<String, Map<Integer, Double>> innerMap1 = new HashMap<>();
+            innerMap1.put("key1", new HashMap<Integer, Double>(){{
+                put(1, 0.3);
+                put(2, 0.4);
+                put(3, 0.5);
+            }});
+            innerMap1.put("key2",new HashMap<Integer, Double>(){{
+                put(3, 3.3);
+                put(4, 4.4);
+            }});
+
+            Map<String, Map<Integer, Double>> innerMap2 = new HashMap<>();
+            innerMap2.put("key3", new HashMap<Integer, Double>(){{
+                put(1, 0.2);
+                put(2, 0.5);
+                put(3, 0.8);
+            }});
+            innerMap2.put("key4", new HashMap<Integer, Double>(){{
+                put(7, 7.7);
+                put(8, 8.8);
+            }});
+
+            Map<String, Map<Integer, Double>> innerMap3 = new HashMap<>();
+            innerMap3.put("key5", new HashMap<Integer, Double>(){{
+                put(1, 0.1);
+                put(2, 0.3);
+                put(3, 0.8);
+            }});
+
+            Map<String, Map<Integer, Double>> innerMap4 = new HashMap<>();
+            innerMap4.put("key7", new HashMap<Integer, Double>(){{
+                put(1, 0.2);
+                put(2, 0.3);
+                put(3, 0.6);
+            }});
+
+            originalMap.put(1L, innerMap1);
+            originalMap.put(2L, innerMap2);
+            originalMap.put(3L, innerMap3);
+            originalMap.put(4L, innerMap4);
+
+            // 过滤第一个 Map 的 String 键并转换结果
+            Map<Long, Double> sumMap = originalMap.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            entry -> entry.getValue().entrySet().stream()
+                                    .filter(innerEntry -> filterCondition(innerEntry.getKey())) // 替换为你的过滤条件 filterCondition(innerEntry.getKey())
+                                    .flatMap(innerEntry -> innerEntry.getValue().entrySet().stream())
+                                    .mapToDouble(Map.Entry::getValue)
+                                    .sum()
+                    ))
+                    .entrySet().stream().collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            v -> Double.parseDouble(String.format("%.4f", v.getValue()))
+                    ))
+                    ;
+            System.out.println(JSONObject.parseObject(JSONObject.toJSONString(sumMap)));
+            // {"1":1.2,"2":1.5,"3":1.2,"4":1.1}
+
+            // 对求和结果进行排序，并处理平等序号
+            List<Map.Entry<Long, Double>> sortedEntries = sumMap.entrySet().stream()
+                    .sorted(Map.Entry.<Long, Double>comparingByValue(Comparator.reverseOrder()))
+                    .collect(Collectors.toList());
+            System.out.println(sortedEntries);
+            // [2=1.5, 1=1.2, 3=1.2, 4=1.1]
+
+            Map<Long, Integer> result = new LinkedHashMap<>();
+            int rank = 1;
+            int previousRank = 1;
+            Double previousValue = null;
+
+            for (int i = 0; i < sortedEntries.size(); i++) {
+                Map.Entry<Long, Double> entry = sortedEntries.get(i);
+                if (previousValue != null && !previousValue.equals(entry.getValue())) {
+                    rank = i + 1;
+                }
+                result.put(entry.getKey(), rank);
+                previousValue = entry.getValue();
+            }
+
+            // 输出结果
+            System.out.println(JSONObject.parseObject(JSONObject.toJSONString(result)));
+            // {"1":2,"2":1,"3":2,"4":4}
+        }
+        // 示例过滤条件：仅保留以 "key1" 或 "key3" 开头的键
+        private static boolean filterCondition(String key) {
+            return key.startsWith("key1") || key.startsWith("key3")|| key.startsWith("key5")|| key.startsWith("key7");
+        }
+        
+        
+        private static int test7(double d1, double d2) {
+            int i = 0;
+            double d = Double.parseDouble(String.format("%.4f", d1 - d2));
+            if (d >= 0.01) {
+                i = (int) (d * 100);
+            }
+            System.out.println("i = " + i);
+            return i;
+        }
+
+        public static void test8() {
+            Map<String, Map<Integer, Double>> innerMap1 = new HashMap<>();
+            innerMap1.put("g1-c1-e1", new HashMap<Integer, Double>(){{
+                put(1, 0.1);
+                put(2, 0.2);
+            }});
+            innerMap1.put("g1-c1-e2",new HashMap<Integer, Double>(){{
+                put(1, 0.3);
+                put(2, 0.4);
+            }});
+            innerMap1.put("g1-c2-e1", new HashMap<Integer, Double>(){{
+                put(1, 0.5);
+                put(2, 0.6);
+            }});
+            innerMap1.put("g1-c2-e2",new HashMap<Integer, Double>(){{
+                put(1, 0.7);
+                put(2, 0.8);
+            }});
+
+            innerMap1.put("g2-c1-e1", new HashMap<Integer, Double>(){{
+                put(1, 0.2);
+                put(2, 0.2);
+            }});
+            innerMap1.put("g2-c1-e2",new HashMap<Integer, Double>(){{
+                put(1, 0.4);
+                put(2, 0.4);
+            }});
+            innerMap1.put("g2-c2-e1", new HashMap<Integer, Double>(){{
+                put(1, 0.5);
+                put(2, 0.6);
+            }});
+            innerMap1.put("g2-c2-e2",new HashMap<Integer, Double>(){{
+                put(1, 0.7);
+                put(2, 0.8);
+            }});
+
+            // 所有Integer的平均值
+            Map<Integer, Double> map = innerMap1.values().stream()
+                    .flatMap(innerMap -> innerMap.entrySet().stream())
+                    .collect(Collectors.groupingBy(
+                            Map.Entry::getKey,
+                            Collectors.averagingDouble(Map.Entry::getValue)
+                    ))
+                    .entrySet().stream().collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            v -> Double.parseDouble(String.format("%.4f", v.getValue()))
+                    ));
+            System.out.println(JSONObject.parseObject(JSONObject.toJSONString(map)));
+            // {"1":0.425,"2":0.5}
+
+            // 按条件重新分组后，分组后分组的Integer的平均值
+            Map<String, Map<Integer, Double>> map1 = innerMap1.entrySet().stream()
+                    .collect(Collectors.groupingBy(
+                            m -> m.getKey().split("-")[0],
+                            Collectors.collectingAndThen(
+                                    Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue),
+                                    m -> m.values().stream()
+                                            .flatMap(innerMap -> innerMap.entrySet().stream())
+                                            .collect(Collectors.groupingBy(
+                                                    Map.Entry::getKey,
+                                                    Collectors.averagingDouble(Map.Entry::getValue)
+                                            )).entrySet().stream().collect(Collectors.toMap(
+                                                    Map.Entry::getKey,
+                                                    v -> Double.parseDouble(String.format("%.4f", v.getValue()))
+                                            ))
+                            )
+                    ));
+            System.out.println(JSONObject.parseObject(JSONObject.toJSONString(map1)));
+            // {"g1":{"1":0.4,"2":0.5},"g2":{"1":0.45,"2":0.5}}
+
+        }
+
+
     }
 
 
