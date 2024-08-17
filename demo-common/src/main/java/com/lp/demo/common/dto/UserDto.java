@@ -1,5 +1,9 @@
 package com.lp.demo.common.dto;
 
+import com.lp.demo.common.config.Enum2AllowableValues;
+import com.lp.demo.common.enums.OperationEventTypeEnum;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -13,15 +17,28 @@ import java.util.Map;
  * @date 2021/5/17 23:53
  * @description
  **/
+@ApiModel(description = "用户")
 @Data
 public class UserDto {
+    @ApiModelProperty(value = "名称")
     private String name;
+    @ApiModelProperty(value = "年龄")
     private Integer age;
+    @ApiModelProperty(value = "手机号")
     private Integer phoneNumber;
+    @ApiModelProperty(value = "地址")
     private String address;
+    @ApiModelProperty(value = "日期")
     private Date date;
+    @ApiModelProperty(value = "爱好")
     private List<String> hobby;
+    @ApiModelProperty(value = "学校")
     private Map<String, String> school;
+
+//    @ApiModelProperty(value = "操作类型", allowableValues = "1:新增,2:修改,3:删除,4:查询") // 原使用方式，需要手动枚举文档
+    @ApiModelProperty(value = "操作类型")
+    @Enum2AllowableValues(value = OperationEventTypeEnum.class, method = "getCode:getName")
+    private String operationEventType;
 
     public static UserDto initUserDto() {
         UserDto userDto = new UserDto();

@@ -4,11 +4,13 @@ import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.lp.demo.common.config.BaseSwaggerConfig;
 import com.lp.demo.common.model.SwaggerProperties;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+//import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableKnife4j
 @Configuration
-@EnableSwagger2
+//@EnableSwagger2
+@EnableSwagger2WebMvc
 public class SwaggerConfig extends BaseSwaggerConfig {
 
     @Override
