@@ -1,5 +1,6 @@
 package com.lp.demo.common.aop.aspect;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -20,6 +21,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -247,7 +250,7 @@ public class SaveLogAspect {
      * @return
      * @throws Throwable
      */
-    @Around("@annotation(operationLog)")
+//    @Around("@annotation(operationLog)")
     public Object logBefore2(ProceedingJoinPoint joinPoint, SaveLog operationLog) throws Throwable {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
@@ -327,6 +330,28 @@ public class SaveLogAspect {
 
         System.out.println("result = " + result);
         return result;
+    }
+
+    @Around("@annotation(operationLog) || " +
+            "(@within(operationLog) && (execution(* com.lp..controller..*(..))) && (" +
+            "           @annotation(org.springframework.web.bind.annotation.PostMapping) || " +
+            "           @annotation(org.springframework.web.bind.annotation.PutMapping) || " +
+            "           @annotation(org.springframework.web.bind.annotation.DeleteMapping) || " +
+            "           @annotation(org.springframework.web.bind.annotation.PatchMapping) ||" +
+            "           @annotation(org.springframework.web.bind.annotation.RequestMapping) " +
+            ")))")
+    public Object operationLogAround(ProceedingJoinPoint joinPoint,
+                                     SaveLog operationLog) throws Throwable {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        if (requestMapping != null) {
+            RequestMethod[] methods = requestMapping.method();
+            if (!CollectionUtil.containsAny(Arrays.asList(methods), Arrays.asList(RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE))) {
+                return null;
+            }
+        }
+        return this.logBefore2(joinPoint, operationLog);
     }
 
     /**
