@@ -16,16 +16,20 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -231,6 +235,125 @@ public class SaveLogAspect {
         return maskLevel == MaskLog.MaskLevelEnum.ALL ? "******" :
                 s.length() > 4 ? StrUtil.hide(s, 2, s.length() - 2) :
                         s.length() <= 0 ? "***" :
-                                s.charAt(0) + "***" + s.charAt(s.length() - 1);
+                                s.length() < 3 ? s.charAt(0) + "***" :
+                                        s.charAt(0) + "***" + s.charAt(s.length() - 1);
     }
+
+    /**
+     * 减少注解需要自定义很多参数
+     *
+     * @param joinPoint
+     * @param operationLog
+     * @return
+     * @throws Throwable
+     */
+    @Around("@annotation(operationLog)")
+    public Object logBefore2(ProceedingJoinPoint joinPoint, SaveLog operationLog) throws Throwable {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+        String remoteAddress = "";
+        if (StringUtil.isEmpty(remoteAddress)) {
+            remoteAddress = request.getRemoteAddr();
+        }
+        String scene = operationLog.scene();
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        if (StringUtil.isEmpty(scene)) {
+//            RequiresPermissions rp = method.getAnnotation(RequiresPermissions.class); // 方法上其它带有描述的注解
+//            if (rp != null && rp.value().length > 0) {
+//                scene = String.join(";", rp.value());
+//            } else {
+                scene = method.getName();
+//            }
+        }
+
+        // 处理入参
+        Map<String, Object> reqMap = new HashMap<>();
+        Parameter[] params = method.getParameters();
+        Object[] args = joinPoint.getArgs();
+        if (ArrayUtil.isNotEmpty(params) && ArrayUtil.isNotEmpty(args)) {
+            MaskLog[] masks = operationLog.masks();
+            for (int i = 0; i < Math.min(params.length, args.length); i++) {
+                String paramName = params[i].getName();
+                Object paramValue = args[i];
+                if (paramValue == null) {
+                    paramValue = "";
+                } else {
+                    if (paramValue instanceof ServletRequest || paramValue instanceof ServletResponse) {
+                        paramValue = "";
+                    } else if (paramValue instanceof MultipartFile) {
+                        paramValue = ((MultipartFile) paramValue).getOriginalFilename();
+                    }
+
+                    if (ArrayUtil.isNotEmpty(masks) && masks.length > i) {
+                        MaskLog mask = masks.length == 1 ? masks[0] : masks[i];
+                        MaskLog.MaskLevelEnum maskLevel = mask.maskLevel();
+                        if (paramValue instanceof CharSequence || paramValue instanceof Number) {
+                            paramValue = this.mask(paramValue.toString(), maskLevel);
+                        } else {
+                            String reqStr = JSONUtil.toJsonStr(paramValue);
+                            JSONObject jsonObject = JSONUtil.parseObj(reqStr);
+                            if (jsonObject.isEmpty()) {
+                                paramValue = "";
+                            } else {
+                                for (String fd : mask.fields()) {
+                                    if (!jsonObject.containsKey(fd)) {
+                                        continue;
+                                    }
+                                    String s = jsonObject.get(fd).toString();
+                                    jsonObject.putOpt(fd, this.mask(s, maskLevel));
+                                }
+                                paramValue = jsonObject;
+                            }
+                        }
+                    }
+                }
+                reqMap.put(paramName, paramValue);
+            }
+        } else if (ArrayUtil.isNotEmpty(params)) {
+            for (int i = 0; i < params.length; i++) {
+                reqMap.put(params[i].getName(), "");
+            }
+        } else if (ArrayUtil.isNotEmpty(args)) {
+            for (int i = 0; i < args.length; i++) {
+                reqMap.put("参数" + (i + 1), args[i]);
+            }
+        }
+
+        System.out.println("reqMap = " + reqMap);
+
+        MethodInvocationProceedingJoinPoint mjoinpoint = (MethodInvocationProceedingJoinPoint) joinPoint;
+        Object result = mjoinpoint.proceed(args != null ? args : new Object[0]);
+
+        System.out.println("result = " + result);
+        return result;
+    }
+
+    /**
+     * @SaveLog的使用方式：
+     * 1、默认使用：@SaveLog，
+     * 2、自定义参数：
+     *     @SaveLog(value = xxx,
+     *             scene = "新增",
+     *             masks = {@MaskLog(
+     *                     fields = {"name", "isDefault"},
+     *                     maskLevel = MaskLog.MaskLevelEnum.PART),
+     *                     @MaskLog(paramsIdx = 1,
+     *                             fields = {"str"},
+     *                             maskLevel = MaskLog.MaskLevelEnum.PART)
+     *             }
+     *     )
+     * 3、对所有参数中名称为"password"和"secret"的全部打码：
+     *     @SaveLog(masks =
+     *              @MaskLog(fields = {"password", "secret"},
+     *                     maskLevel = MaskLog.MaskLevelEnum.ALL)
+     *
+     *     )
+     * 4、只对第二个参数中名称为"name"的部分打码：
+     *     @SaveLog(masks = {
+     *                  @MaskLog, // 注意：这里表示第一个参数，为必须
+     *                  @MaskLog(fields = {"name"})
+     *              }
+     *     )
+     */
 }
