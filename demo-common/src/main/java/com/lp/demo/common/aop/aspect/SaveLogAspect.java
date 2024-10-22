@@ -348,7 +348,7 @@ public class SaveLogAspect {
         if (requestMapping != null) {
             RequestMethod[] methods = requestMapping.method();
             if (!CollectionUtil.containsAny(Arrays.asList(methods), Arrays.asList(RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE))) {
-                return null;
+                return joinPoint.proceed();
             }
         }
         return this.logBefore2(joinPoint, operationLog);
