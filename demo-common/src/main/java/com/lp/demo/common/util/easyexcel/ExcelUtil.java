@@ -16,6 +16,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -282,5 +285,22 @@ public class ExcelUtil {
      */
     public static <T> List<T> getExtendsBeanList(List<?> list, Class<T> typeClazz) {
         return MyBeanCopy.convert(list, typeClazz);
+    }
+
+    /**
+     * 导出文件到本地
+     *
+     * @param os
+     * @param fileName
+     */
+    public static void writeExcelToLocal(ByteArrayOutputStream os, String fileName) {
+        String path = "D:"+ File.separator + "Doc" + File.separator + fileName + "_" + System.currentTimeMillis() + ".xlsx";
+        try {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(path)) {
+                os.writeTo(fileOutputStream);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
