@@ -28,6 +28,11 @@
         <module>demo-nacos</module>
         <module>demo-iot</module>
         <module>demo-seata</module>
+        <module>demo-seata/demo-account-service</module>
+        <module>demo-seata/demo-business-service</module>
+        <module>demo-seata/demo-order-service</module>
+        <module>demo-seata/demo-storage-service</module>
+        <module>demo-seata/demo-seata-fix_will_connect_to_xxx</module>
         <module>demo-sentinel</module>
         <module>demo-auth</module>
         <module>demo-xxljob</module>
@@ -37,7 +42,24 @@
         <module>demo-reactor</module>
         <module>demo-spring</module>
         <module>demo-ddd</module>
+        <module>demo-ddd/component-client</module>
+        <module>demo-ddd/component-codegen</module>
+        <module>demo-ddd/component-common</module>
+        <module>demo-ddd/component-service</module>
+        <module>demo-ddd/component-test</module>
         <module>demo-mqtt-broker</module>
+        <module>demo-mysql-shardingsphere</module>
+        <module>demo-mysql-shardingsphere/demo-shardingsphere-jdbc-common</module>
+        <module>demo-mysql-shardingsphere/demo-shardingsphere-jdbc-domain</module>
+        <module>demo-mysql-shardingsphere/demo-shardingsphere-jdbc-server</module>
+        <module>demo-mysql-shardingsphere/demo-shardingsphere-jdbc-service</module>
+        <module>demo-mongodb</module>
+        <module>demo-cassandra</module>
+        <module>demo-iotdb</module>
+        <module>demo-ai</module>
+        <module>demo-ai/ai-core</module>
+        <module>demo-ai/ai-webapp</module>
+        <module>demo-ai/ai-spring-boot-starter</module>
     </modules>
 
     <properties>

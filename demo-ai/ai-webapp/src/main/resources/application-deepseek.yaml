@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: demo-deepseek
+deepseek:
+  base-url: https://api.deepseek.com/v1
+  api-key: sk-8901b0eb5e87400eb1b979fbcf8424ff
+  model: deepseek-reasoner
+
+
