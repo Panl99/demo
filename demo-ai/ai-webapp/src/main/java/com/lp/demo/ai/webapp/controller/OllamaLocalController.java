@@ -1,13 +1,14 @@
 package com.lp.demo.ai.webapp.controller;
 
-import com.lp.demo.ai.config.deepseek.DeepSeekProperties;
-import com.lp.demo.ai.core.DeepSeekClient;
+import com.lp.demo.ai.config.deepseek.OllamaProperties;
 import com.lp.demo.ai.core.Json;
+import com.lp.demo.ai.core.OllamaClient;
 import com.lp.demo.ai.core.SyncOrAsyncOrStreaming;
 import com.lp.demo.ai.core.chat.ChatCompletionChoice;
 import com.lp.demo.ai.core.chat.ChatCompletionRequest;
 import com.lp.demo.ai.core.chat.ChatCompletionResponse;
 import com.lp.demo.ai.core.models.ModelsResponse;
+import com.lp.demo.ai.webapp.util.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
@@ -29,14 +31,15 @@ import java.util.stream.Collectors;
 public class OllamaLocalController {
 
 	@Resource
-	private DeepSeekClient deepSeekClient;
+	private OllamaClient ollamaClient;
 
 	@Resource
-	private DeepSeekProperties deepSeekProperties;
+	private OllamaProperties ollamaProperties;
 
 	@GetMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<ChatCompletionResponse> chat(String prompt) {
-		return deepSeekClient.chatFluxCompletion(prompt);
+	public Flux<ChatCompletionResponse> chat(String prompt, HttpServletRequest request) {
+		log.info("ip: {}", Utils.getClientIp(request));
+		return ollamaClient.chatFluxCompletion(prompt);
 	}
 
 	// 同步
@@ -44,17 +47,17 @@ public class OllamaLocalController {
 	public ChatCompletionResponse syncChat(String prompt) {
 		ChatCompletionRequest request = ChatCompletionRequest.builder()
 				// 根据渠道模型名称动态修改这个参数
-				.model(deepSeekProperties.getModel()).addUserMessage(prompt).build();
+				.model(ollamaProperties.getModel()).addUserMessage(prompt).build();
 
-		return deepSeekClient.chatCompletion(request).execute();
+		return ollamaClient.chatCompletion(request).execute();
 	}
 
 	// 异步
 	@GetMapping(value = "/async/chat")
 	public void asyncChat(String prompt) {
-		ChatCompletionRequest request = ChatCompletionRequest.builder().model(deepSeekProperties.getModel())
+		ChatCompletionRequest request = ChatCompletionRequest.builder().model(ollamaProperties.getModel())
 				.addUserMessage(prompt).build();
-		SyncOrAsyncOrStreaming<ChatCompletionResponse> asyncOrStreaming = deepSeekClient.chatCompletion(request);
+		SyncOrAsyncOrStreaming<ChatCompletionResponse> asyncOrStreaming = ollamaClient.chatCompletion(request);
 		asyncOrStreaming.onResponse((responseContent) -> {
 			log.info("处理返回数据：{}", Json.toJson(responseContent));
 		}, exception -> {
@@ -64,7 +67,7 @@ public class OllamaLocalController {
 
 	@GetMapping(value = "/models", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ModelsResponse models() {
-		return deepSeekClient.models();
+		return ollamaClient.models();
 	}
 
 	public final static HashMap<String, String> cache = new HashMap<>();
@@ -73,13 +76,13 @@ public class OllamaLocalController {
 	public Flux<ChatCompletionResponse> chatAdvanced(String prompt, String cacheCode) {
 		log.info("cacheCode {}", cacheCode);
 
-		ChatCompletionRequest request = ChatCompletionRequest.builder().model(deepSeekProperties.getModel())
+		ChatCompletionRequest request = ChatCompletionRequest.builder().model(ollamaProperties.getModel())
 				.addUserMessage(prompt).addAssistantMessage(elt.apply(cache.getOrDefault(cacheCode, "")))
 				.addSystemMessage("你是一个专业的助手").maxCompletionTokens(5000).build();
 		log.info("request {}", Json.toJson(request));
 		// 只保留上一次回答内容
 		cache.remove(cacheCode);
-		return deepSeekClient.chatFluxCompletion(request).doOnNext(i -> {
+		return ollamaClient.chatFluxCompletion(request).doOnNext(i -> {
 			String content = choicesProcess.apply(i.choices());
 			// 其他ELT流程
 			cache.merge(cacheCode, content, String::concat);

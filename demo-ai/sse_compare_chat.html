@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN" :data-theme="currentTheme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek Chat</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.5.13/vue.global.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/marked/15.0.6/marked.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/daisyui/4.12.23/full.min.css" rel="stylesheet" type="text/css"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        [data-theme='dark'] ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        [data-theme='dark'] ::-webkit-scrollbar-track {
+            background: #2C2C2C;
+            border-radius: 4px;
+        }
+
+        [data-theme='dark'] ::-webkit-scrollbar-thumb {
+            background: #424242;
+            border-radius: 4px;
+        }
+
+        [data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+            background: #505050;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-base-100 transition-colors duration-200">
+<div id="app">
+
+    <main class="h-[calc(100vh-16rem)] container mx-auto px-4 py-2 overflow-hidden">
+        <div class="flex gap-4 h-full">
+            <!-- 左侧推理过程和答案区域 -->
+            <div class="w-1/2 flex flex-col">
+                <!-- 头部区域 -->
+                <div class="mb-8">
+                    <!-- 标题行：图标和问候语 -->
+                    <div class="flex items-center gap-4 mb-4">
+                        <h1 class="text-xl">调用官方DeepSeek接口👇:</h1>
+                    </div>
+                </div>
+
+                <!-- 推理过程 -->
+                <div>
+                    <h2 class="text-lg font-bold mb-2">推理过程</h2>
+                    <div class="bg-base-200 rounded-lg p-4">
+                        <div ref="reasoningRef" class="min-h-[100px] max-h-[200px] overflow-y-auto"> <!--whitespace-pre-wrap-->
+                            {{ reasoningChain || '暂无推理过程' }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最终答案 -->
+                <div>
+                    <h2 class="text-lg font-bold mb-2">最终答案</h2>
+                    <div class="bg-base-200 rounded-lg p-4">
+                        <div ref="answerRef"
+                             class="min-h-[150px] max-h-[200px] overflow-y-auto prose dark:prose-invert max-w-none"
+                             v-html="finalAnswer || '暂无答案'">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 右侧推理过程和答案区域 -->
+            <div class="w-1/2 flex flex-col">
+                <!-- 头部区域 -->
+                <div class="mb-8">
+                    <!-- 标题行：图标和问候语 -->
+                    <div class="flex items-center gap-4 mb-4">
+                        <h1 class="text-xl">调用本地部署DeepSeek接口👇:</h1>
+                    </div>
+                </div>
+
+                <!-- 推理过程 -->
+                <div>
+                    <h2 class="text-lg font-bold mb-2">推理过程</h2>
+                    <div class="bg-base-200 rounded-lg p-4">
+                        <div ref="reasoningRef" class="min-h-[100px] max-h-[200px] overflow-y-auto"> <!--whitespace-pre-wrap-->
+                            {{ reasoningChain2 || '暂无推理过程' }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最终答案 -->
+                <div>
+                    <h2 class="text-lg font-bold mb-2">最终答案</h2>
+                    <div class="bg-base-200 rounded-lg p-4">
+                        <div ref="answerRef"
+                             class="min-h-[150px] max-h-[200px] overflow-y-auto prose dark:prose-invert max-w-none"
+                             v-html="finalAnswer2 || '暂无答案'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </main>
+    <!-- 聊天区域 -->
+    <div class="space-y-6">
+        <!-- 输入区域 -->
+        <div class="h-[calc(100vh-36rem)] container mx-auto px-4 py-2 overflow-hidden">
+                    <textarea
+                            v-model="userInput"
+                            class="w-full h-16 p-4 rounded-lg bg-base-200 resize-none focus:outline-none"
+                            placeholder="给 DeepSeek 发送消息"
+                    ></textarea>
+
+            <div class="flex gap-2 mt-2">
+                <button
+                        @click="connectAll"
+                        :disabled="isConnected"
+                        class="btn btn-primary"
+                >
+                    提交
+                </button>
+                <button
+                        @click="disconnectAll"
+                        :disabled="!isConnected"
+                        class="btn btn-error"
+                >
+                    断开
+                </button>
+                <button
+                        @click="clearMessages"
+                        class="btn btn-ghost"
+                >
+                    清空
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const {createApp, ref, computed, watch, nextTick} = Vue
+
+    createApp({
+        setup() {
+            const userInput = ref('')
+            const messages = ref([])
+            const isConnected = ref(false)
+            const isInThinkTag = ref(false)
+            let eventSource = null
+            const reasoningRef = ref(null)
+            const answerRef = ref(null)
+
+            // 右侧
+            const messages2 = ref([])
+            const isInThinkTag2 = ref(false)
+            let eventSource2 = null
+            const reasoningRef2 = ref(null)
+            const answerRef2 = ref(null)
+
+            const reasoningChain = computed(() => {
+                return messages.value
+                    .filter(m => m.parsed?.reasoning_content)
+                    .map(m => m.parsed.reasoning_content)
+                    .join('')
+            })
+
+            const finalAnswer = computed(() => {
+                const rawContent = messages.value
+                    .filter(m => m.parsed?.content)
+                    .map(m => m.parsed.content)
+                    .join('')
+                return marked.parse(rawContent)
+            })
+
+            // 右侧
+            const reasoningChain2 = computed(() => {
+                return messages2.value
+                    .filter(m => m.parsed?.reasoning_content)
+                    .map(m => m.parsed.reasoning_content)
+                    .join('')
+            })
+            const finalAnswer2 = computed(() => {
+                const rawContent = messages2.value
+                    .filter(m => m.parsed?.content)
+                    .map(m => m.parsed.content)
+                    .join('')
+                return marked.parse(rawContent)
+            })
+
+            const scrollToBottom = (element) => {
+                if (element) {
+                    const scrollContainer = element
+                    if (scrollContainer) {
+                        scrollContainer.scrollTop = scrollContainer.scrollHeight
+                    }
+                }
+            }
+
+            watch(() => [messages.value.length, reasoningChain.value, finalAnswer.value, messages2.value.length, reasoningChain2.value, finalAnswer2.value], () => {
+                nextTick(() => {
+                    if (reasoningRef.value) {
+                        scrollToBottom(reasoningRef.value)
+                    }
+                    if (answerRef.value) {
+                        scrollToBottom(answerRef.value)
+                    }
+                    if (reasoningRef2.value) {
+                        scrollToBottom(reasoningRef2.value)
+                    }
+                    if (answerRef2.value) {
+                        scrollToBottom(answerRef2.value)
+                    }
+                })
+            }, {deep: true})
+
+            const parseSSEData = (data) => {
+                try {
+                    const parsed = JSON.parse(data)
+                    const directReasoning = parsed.choices?.[0]?.delta?.reasoning_content
+                    if (directReasoning) {
+                        return {
+                            id: parsed.id,
+                            created: parsed.created,
+                            model: parsed.model,
+                            reasoning_content: directReasoning,
+                            content: parsed.choices?.[0]?.delta?.content || ''
+                        }
+                    }
+
+                    const content = parsed.choices?.[0]?.delta?.content || ''
+
+                    if (content.includes('<think>')) {
+                        isInThinkTag.value = true
+                        const startIndex = content.indexOf('<think>') + '<think>'.length
+                        return {
+                            id: parsed.id,
+                            created: parsed.created,
+                            model: parsed.model,
+                            reasoning_content: content.substring(startIndex),
+                            content: content.substring(0, content.indexOf('<think>'))
+                        }
+                    }
+
+                    if (content.includes('</think>')) {
+                        isInThinkTag.value = false
+                        const endIndex = content.indexOf('</think>')
+                        return {
+                            id: parsed.id,
+                            created: parsed.created,
+                            model: parsed.model,
+                            reasoning_content: content.substring(0, endIndex),
+                            content: content.substring(endIndex + '</think>'.length)
+                        }
+                    }
+
+                    return {
+                        id: parsed.id,
+                        created: parsed.created,
+                        model: parsed.model,
+                        reasoning_content: isInThinkTag.value ? content : '',
+                        content: isInThinkTag.value ? '' : content
+                    }
+                } catch (e) {
+                    console.error('解析JSON失败:', e)
+                    return null
+                }
+            }
+
+            // 右侧
+            const parseSSEData2 = (data) => {
+                try {
+                    const parsed = JSON.parse(data)
+                    const directReasoning = parsed.choices?.[0]?.delta?.reasoning_content
+                    if (directReasoning) {
+                        return {
+                            id: parsed.id,
+                            created: parsed.created,
+                            model: parsed.model,
+                            reasoning_content: directReasoning,
+                            content: parsed.choices?.[0]?.delta?.content || ''
+                        }
+                    }
+
+                    const content = parsed.choices?.[0]?.delta?.content || ''
+
+                    if (content.includes('<think>')) {
+                        isInThinkTag2.value = true
+                        const startIndex = content.indexOf('<think>') + '<think>'.length
+                        return {
+                            id: parsed.id,
+                            created: parsed.created,
+                            model: parsed.model,
+                            reasoning_content: content.substring(startIndex),
+                            content: content.substring(0, content.indexOf('<think>'))
+                        }
+                    }
+
+                    if (content.includes('</think>')) {
+                        isInThinkTag2.value = false
+                        const endIndex = content.indexOf('</think>')
+                        return {
+                            id: parsed.id,
+                            created: parsed.created,
+                            model: parsed.model,
+                            reasoning_content: content.substring(0, endIndex),
+                            content: content.substring(endIndex + '</think>'.length)
+                        }
+                    }
+
+                    return {
+                        id: parsed.id,
+                        created: parsed.created,
+                        model: parsed.model,
+                        reasoning_content: isInThinkTag2.value ? content : '',
+                        content: isInThinkTag2.value ? '' : content
+                    }
+                } catch (e) {
+                    console.error('解析JSON失败:', e)
+                    return null
+                }
+            }
+
+            const connect = () => {
+                if (eventSource) {
+                    eventSource.close()
+                }
+
+                if (!userInput.value.trim()) {
+                    alert('请输入消息')
+                    return
+                }
+
+                clearMessages()
+
+                try {
+                    const baseUrl = 'http://localhost:8080/chat'
+                    const url = `${baseUrl}?prompt=${encodeURIComponent(userInput.value.trim())}`
+
+                    eventSource = new EventSource(url)
+                    isConnected.value = true
+
+                    eventSource.onmessage = (event) => {
+                        const parsed = parseSSEData(event.data)
+                        messages.value.push({
+                            time: new Date().toLocaleTimeString(),
+                            data: event.data,
+                            parsed: parsed
+                        })
+                    }
+
+                    eventSource.onerror = (error) => {
+                        console.error('SSE Error:', error)
+                        disconnect()
+                    }
+                } catch (error) {
+                    console.error('Connection Error:', error)
+                    disconnect()
+                }
+            }
+
+            // 右侧
+            const connect2 = () => {
+                if (eventSource2) {
+                    eventSource2.close()
+                }
+
+                if (!userInput.value.trim()) {
+                    alert('请输入消息')
+                    return
+                }
+
+                clearMessages()
+
+                try {
+                    const baseUrl = 'http://localhost:8080/ollama/chat'
+                    const url = `${baseUrl}?prompt=${encodeURIComponent(userInput.value.trim())}`
+
+                    eventSource2 = new EventSource(url)
+                    isConnected.value = true
+
+                    eventSource2.onmessage = (event) => {
+                        const parsed = parseSSEData2(event.data)
+                        messages2.value.push({
+                            time: new Date().toLocaleTimeString(),
+                            data: event.data,
+                            parsed: parsed
+                        })
+                    }
+
+                    eventSource2.onerror = (error) => {
+                        console.error('SSE Error:', error)
+                        disconnect2()
+                    }
+                } catch (error) {
+                    console.error('Connection Error:', error)
+                    disconnect2()
+                }
+            }
+
+            // 连接方法
+            const connectAll = () => {
+                if (!userInput.value.trim()) return alert('请输入消息')
+                clearMessages()
+                connect()
+                connect2()
+            }
+            const disconnectAll = () => {
+                disconnect()
+                disconnect2()
+            }
+
+            const disconnect = () => {
+                if (eventSource) {
+                    eventSource.close()
+                    eventSource = null
+                }
+                if (!eventSource && !eventSource2) {
+                    isConnected.value = false
+                }
+            }
+
+            const disconnect2 = () => {
+                if (eventSource2) {
+                    eventSource2.close()
+                    eventSource2 = null
+                }
+                if (!eventSource && !eventSource2) {
+                    isConnected.value = false
+                }
+            }
+
+            const clearMessages = () => {
+                messages.value = []
+                messages2.value = []
+            }
+
+            return {
+                userInput,
+                messages,
+                messages2,
+                isConnected,
+                connectAll,
+                disconnectAll,
+                clearMessages,
+                reasoningChain,
+                reasoningChain2,
+                finalAnswer,
+                finalAnswer2,
+                reasoningRef,
+                reasoningRef2,
+                answerRef,
+                answerRef2
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>

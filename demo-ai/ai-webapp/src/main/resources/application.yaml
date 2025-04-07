@@ -1,5 +1,18 @@
 spring:
-  profiles:
-    active: deepseek
+#  profiles:
+#    active: ollama
   application:
-    name: demo-deepseek
+    name: demo-ai
+deepseek:
+  base-url: https://api.deepseek.com/v1
+  api-key: sk-8901b0eb5e87400eb1b979fbcf8424ff
+  model: deepseek-reasoner
+ollama:
+  base-url: http://127.0.0.1:11434/v1
+  model: deepseek-r1:7b
+  api-key: ollama-local
+  log-level: info
+embedding:
+  api-key: ollama-local
+  base-url: http://127.0.0.1:11434/v1
+  model: deepseek-r1:7b

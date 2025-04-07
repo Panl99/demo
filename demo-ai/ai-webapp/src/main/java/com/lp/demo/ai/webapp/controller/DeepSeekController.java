@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @RequestMapping
-public class DeepSeekLocalController {
+public class DeepSeekController {
 
 	@Resource
 	private DeepSeekClient deepSeekClient;
