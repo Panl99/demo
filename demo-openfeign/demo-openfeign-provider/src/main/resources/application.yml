@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: demo-openfeign-provider
+
+server:
+  port: 8081

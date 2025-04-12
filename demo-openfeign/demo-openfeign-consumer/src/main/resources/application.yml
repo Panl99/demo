@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: demo-openfeign-consumer
+
+server:
+  port: 8082
+
+feign:
+  client:
+    config:
+      default: # \u5168\u5C40\u9ED8\u8BA4\u914D\u7F6E
+        connectTimeout: 5000
+        readTimeout: 5000
+      demo-openfeign-provider: # \u9488\u5BF9\u7279\u5B9A\u670D\u52A1\u7684\u914D\u7F6E
+        connectTimeout: 3000
+        readTimeout: 3000
