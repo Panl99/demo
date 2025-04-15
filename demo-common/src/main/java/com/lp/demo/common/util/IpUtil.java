@@ -1,6 +1,7 @@
 package com.lp.demo.common.util;
 
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,7 +74,56 @@ public class IpUtil {
 
     /**
      * 根据ip地址查询归属地
-     * current way: https://ip-api.com/docs/api:json （秒级延迟）
+     *
+     * 百度开放平台接口：http://opendata.baidu.com/api.php?query=219.140.8.8&co=&resource_id=6006&oe=utf8
+     * VORE-API：https://api.vore.top/doc/IPdata.html
+     *
+     * @link 免费ip地址信息api接口归纳：https://429006.com/article/technology/4911.htm
+     *
+     * @param ip IP地址
+     * @return IP归属地
+     */
+    public static final String[] private_address = {"127.0.0.1", "localhost"};
+    public static String getIpAddressByBaiduOpenData(String ip) {
+        if (StringUtil.isEmpty(ip)) {
+            return "";
+        }
+        if (Arrays.asList(private_address).contains(ip)) {
+            return "私有地址";
+        }
+        String url = "http://opendata.baidu.com/api.php";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("query", ip);
+        paramMap.put("co", "");
+        paramMap.put("resource_id", 6006); // 6006 对应百度开放的IP地理位置查询服务
+        paramMap.put("oe", "utf8");
+        String resp;
+        try {
+            resp = HttpUtil.get(url, paramMap, 10 * 1000);
+        } catch (Exception e) {
+            System.out.println("get ip location address error! ip: " + ip + ", e: " + e.getMessage());
+            return "";
+        }
+
+        return parseBaiduOpenDataResp(resp);
+    }
+    private static String parseBaiduOpenDataResp(String s) {
+        JSONObject jo = JSONObject.parseObject(s);
+        String status = jo.getString("status");
+        if ("0".equalsIgnoreCase(status)) {
+            JSONArray data = jo.getJSONArray("data");
+            JSONObject dataJSONObject = data.getJSONObject(0);
+            return dataJSONObject.getString("location");
+        }
+        System.out.println("Unknown get ip location address response status! response = " + s);
+        return "未知";
+    }
+
+
+
+    /**
+     * 根据ip地址查询归属地
+     * current way: https://ip-api.com/docs/api:json （秒级延迟），注意：不能商用
      * anther way: https://github.com/lionsoul2014/ip2region （自称0.x毫秒、离线）
      *
      * @param ip IP地址
