@@ -7,12 +7,15 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,8 +78,8 @@ public class IpUtil {
     /**
      * 根据ip地址查询归属地
      *
-     * 百度开放平台接口：http://opendata.baidu.com/api.php?query=219.140.8.8&co=&resource_id=6006&oe=utf8
-     * VORE-API：https://api.vore.top/doc/IPdata.html
+     * 百度开放平台接口：http://opendata.baidu.com/api.php?query=219.140.8.8&co=&resource_id=6006&oe=utf8，准确性差点
+     * VORE-API：https://api.vore.top/doc/IPdata.html，准确性差点
      *
      * @link 免费ip地址信息api接口归纳：https://429006.com/article/technology/4911.htm
      *
@@ -118,6 +121,88 @@ public class IpUtil {
         System.out.println("Unknown get ip location address response status! response = " + s);
         return "未知";
     }
+
+    public static String getIpAddressByVore(String ip) {
+        if (StringUtil.isEmpty(ip)) {
+            return "";
+        }
+        if (Arrays.asList(private_address).contains(ip)) {
+            return "私有地址";
+        }
+        String url = "https://api.vore.top/api/IPdata" + ip;
+        Map<String, Object> paramMap = new HashMap<>();
+        String resp;
+        try {
+            resp = HttpUtil.get(url, paramMap, 10 * 1000);
+        } catch (Exception e) {
+            System.out.println("get ip location address error! ip: " + ip + ", e: " + e.getMessage());
+            return "";
+        }
+
+        return parseVoreResp(resp);
+    }
+
+    private static String parseVoreResp(String s) {
+        JSONObject jo = JSONObject.parseObject(s);
+        String status = jo.getString("status");
+        if ("0".equalsIgnoreCase(status)) {
+            JSONArray data = jo.getJSONArray("data");
+            JSONObject dataJSONObject = data.getJSONObject(0);
+            return dataJSONObject.getString("location");
+        }
+        System.out.println("Unknown get ip location address response status! response = " + s);
+        return "未知";
+    }
+
+
+    /**
+     * <dependency>
+     *     <groupId>com.maxmind.geoip2</groupId>
+     *     <artifactId>geoip2</artifactId>
+     *     <version>4.2.1</version>
+     * </dependency>
+     * 
+     * 需要地图文件
+     *         
+     */
+//    public static class IpLocation {
+//        private DatabaseReader reader;
+//
+//        public IpLocation(String dbPath) throws IOException {
+//            File database = new File(dbPath); // "/path/to/GeoIP2-City.mmdb"
+//            this.reader = new DatabaseReader.Builder(database).build();
+//        }
+//
+//        public String getCityLocation(String ip) {
+//            try {
+//                InetAddress ipAddress = InetAddress.getByName("128.101.101.101");
+//
+//                CityResponse response = reader.city(ipAddress);
+//
+//                Country country = response.getCountry();
+//                System.out.println(country.getIsoCode());            // 'US'
+//                System.out.println(country.getName());               // 'United States'
+//                System.out.println(country.getNames().get("zh-CN")); // '美国'
+//
+//                Subdivision subdivision = response.getMostSpecificSubdivision();
+//                System.out.println(subdivision.getName());    // 'Minnesota'
+//                System.out.println(subdivision.getIsoCode()); // 'MN'
+//
+//                City city = response.getCity();
+//                System.out.println(city.getName()); // 'Minneapolis'
+//
+//                Postal postal = response.getPostal();
+//                System.out.println(postal.getCode()); // '55455'
+//
+//                Location location = response.getLocation();
+//                System.out.println(location.getLatitude());  // 44.9733
+//                System.out.println(location.getLongitude()); // -93.2323
+//            } catch (IOException | GeoIp2Exception e) {
+//                System.out.println("get ip location address error! ip: " + ip + ", e: " + e.getMessage());
+//                return "未知";
+//            }
+//        }
+//    }
 
 
 
