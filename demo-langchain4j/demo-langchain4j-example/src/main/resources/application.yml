@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: demo-langchain4j-example
+
+deepseek:
+  model: deepseek-reasoner
+  base-url: https://api.deepseek.com/v1
+  api-key: sk-xxx
+ollama:
+  model: deepseek-r1:7b
+  base-url: http://xxx.xxx.xxx.xxx:11434
+#qwen:
+#  model: qwen2.5:7b
+#    base-url: http://xxx.xxx.xxx.xxx:11434
+#    api-key:
+#ollama:
+#  deepseek:
+#    model-name: deepseek-r1:7b
+#    base-url: http://xxx.xxx.xxx.xxx:11434
+#  qwen:
+#    model-name: qwen2.5:7b
+#    base-url: http://xxx.xxx.xxx.xxx:11434
