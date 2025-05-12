@@ -39,7 +39,7 @@
 //                    .modelName(qwenConfig.getModel())
 //                    .build();
 //            return AiServices.builder(AssistantService.class)
-//                    .streamingChatLanguageModel(streamingChatModel)
+//                    .streamingChatModel(streamingChatModel)
 //                    .chatMemoryProvider(memoryId -> MessageWindowChatMemory.withMaxMessages(10))
 //                    .build()
 //                    .streamingChat(request.getSessionId(), request.getPrompt());
@@ -49,7 +49,7 @@
 //                    .modelName(qwenConfig.getModel())
 //                    .build();
 //            return AiServices.builder(AssistantService.class)
-//                    .chatLanguageModel(chatModel)
+//                    .chatModel(chatModel)
 //                    .chatMemoryProvider(memoryId -> MessageWindowChatMemory.withMaxMessages(10))
 //                    .build()
 //                    .chat(request);

@@ -33,8 +33,8 @@ public abstract class LLMStrategyService implements StrategyService {
                 .modelName(config.getModel())
                 .build();
         AssistantService assistantService = AiServices.builder(AssistantService.class)
-                .chatLanguageModel(chatModel)
-                .streamingChatLanguageModel(streamingChatModel)
+                .chatModel(chatModel)
+                .streamingChatModel(streamingChatModel)
                 .chatMemoryProvider(memoryId -> MessageWindowChatMemory.withMaxMessages(10))
                 .build();
         ASSISTANT_SERVICE_SESSION_MAP.put(request.getSessionId(), assistantService);
