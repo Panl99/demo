@@ -20,6 +20,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -351,7 +353,67 @@ public class SaveLogAspect {
                 return joinPoint.proceed();
             }
         }
-        return this.logBefore2(joinPoint, operationLog);
+        // 获取方法上的注解（优先）
+        SaveLog methodAnnotation = AnnotationUtils.findAnnotation(method, SaveLog.class);
+        // 获取类上的注解
+        SaveLog clazzAnnotation = AnnotationUtils.findAnnotation(joinPoint.getTarget().getClass(), SaveLog.class);
+
+        // 1.优先使用方法注解的方式
+//        return this.logBefore2(joinPoint, methodAnnotation != null ? methodAnnotation : clazzAnnotation);
+        // 2.使用方法注解和类注解合并的方式
+        return this.logBefore2(joinPoint, this.mergeAnnotations(clazzAnnotation, methodAnnotation));
+    }
+
+    /**
+     * 合并方法注解和类注解参数
+     *
+     * @param clazzAnnotation
+     * @param methodAnnotation
+     * @return
+     */
+    private SaveLog mergeAnnotations(SaveLog clazzAnnotation, SaveLog methodAnnotation) {
+        // 1.只有方法注解
+        if (methodAnnotation != null && clazzAnnotation == null) {
+            return methodAnnotation;
+        }
+        // 2.只有类注解
+        if (methodAnnotation == null && clazzAnnotation != null) {
+            return clazzAnnotation;
+        }
+        // 3.两者都存在，使用方法注解值（仅当方法注解使用默认值时回退到类注解）
+        return new SaveLog() {
+
+            @Override
+            public int[] paramsIdxes() {
+                return (methodAnnotation.paramsIdxes() == null || methodAnnotation.paramsIdxes().length < 1) ? clazzAnnotation.paramsIdxes() : methodAnnotation.paramsIdxes();
+            }
+
+            @Override
+            public String[] params() {
+                return (methodAnnotation.params() == null || methodAnnotation.params().length < 1) ? clazzAnnotation.params() : methodAnnotation.params();
+            }
+
+            @Override
+            public String scene() {
+                return StringUtil.isEmpty(methodAnnotation.scene()) ? clazzAnnotation.scene() : methodAnnotation.scene();
+            }
+
+            @Override
+            public MaskLog[] masks() {
+                return (methodAnnotation.masks() == null || methodAnnotation.masks().length < 1) ? clazzAnnotation.masks() : methodAnnotation.masks();
+            }
+
+            @Override
+            public String[] value() {
+                return (methodAnnotation.value() == null || methodAnnotation.value().length < 1) ? clazzAnnotation.value() : methodAnnotation.value();
+            }
+
+            // 实现注解接口的其他必要方法...
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return SaveLog.class;
+            }
+        };
     }
 
     /**
