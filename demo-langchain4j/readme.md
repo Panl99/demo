@@ -33,3 +33,52 @@ Provider供应商 | 流式 | 工具（同步/流式） | JSON结构（Schema） 
 > [https://docs.langchain4j.dev/integrations/language-models/](https://docs.langchain4j.dev/integrations/language-models/)
 
 
+# langchain4j版本特性
+
+## 1.0.0 + 1.0.0-beta5
+
+发布时间：2025.05.14
+
+
+
+## 1.0.0-rc1 + 1.0.0-beta4
+
+发布时间：2025.05.02
+
+- 5月中旬发布最终1.0.0版本
+- 6月发布下一组候选1.0.0-rc1模块
+
+### 1.0.0-rc1 (release candidate 1)
+候选release版本：
+- langchain4j
+- langchain4j-core
+- langchain4j-open-ai
+- langchain4j-http-client
+- langchain4j-http-client-jdk
+
+### 1.0.0-beta4
+
+- langchain4j-ollama
+- langchain4j-community-dashscope
+- ...
+
+### 内容变更
+
+- 支持GPT4.1
+
+
+
+
+# LangChain4j对比SpringAI
+
+- langchain4j功能更强大
+- langchain4j学习成本较高
+- langchain4j文档不够全面
+
+- 简单功能、短时开发，使用spring ai
+- 功能复杂、定制化要求多、灵活度更高，使用langchain4j
+
+功能 | LangChain4j | SpringAI 
+---|---|---
+ |  | 
+

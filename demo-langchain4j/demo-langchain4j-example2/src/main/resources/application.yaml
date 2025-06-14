@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: demo-langchain4j-example2
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/langchain4j?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&useTimezone=true
+    username: root
+    password: 123456
+  #redis
+#  data:
+#    redis:
+#      host: 127.0.0.1
+#      port: 6379
+#      password: 123456
+
+
+
+langchain4j:
+#  community:
+#    dashscope:
+#      chat-model:
+#        api-key: ${DASHSCOPE_APIKEY}
+#        #model-name: deepseek-v3
+#        model_name: qwen-max
+##        model-name: qwen-vl-plus
+#      embedding-model:
+#        api-key: sk-3723090ff214456aa7dde971aa4576bb
+#        model-name: qwen-max
+  ollama:
+    chat-model:
+      base-url: http://127.0.0.1:11434
+#      model-name: deepseek-r1:7b #qwen2.5:7b
+      model-name: qwen2.5:7b # 支持函数调用
+    embedding-model:
+      base-url: http://127.0.0.1:11434
+      model-name: qwen2.5:7b
+
+
+# embedding store
+pgvector:
+  database: langchain4j
+  host: 127.0.0.1
+  port : 5432
+  user: postgres
+  password: 123456
+  table: demo_embeddings
+
+## redis
+#redis-embedding-store:
+#  host: 127.0.0.1
+#  port: 6379
+##  dimension: 384
+
+search:
+  apiKey: ${SEARCH_APIKEY}
+  engine: baidu
+

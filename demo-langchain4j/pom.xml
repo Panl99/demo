@@ -22,7 +22,8 @@
 
 	<properties>
 		<java.version>21</java.version>
-		<langchain4j.version>1.0.0-rc1</langchain4j.version>
+		<langchain4j.version>1.0.0</langchain4j.version>
+		<langchain4j-beta.version>1.0.0-beta5</langchain4j-beta.version>
 	</properties>
 
 	<dependencies>
@@ -69,15 +70,13 @@
 			<dependency>
 				<groupId>dev.langchain4j</groupId>
 				<artifactId>langchain4j-ollama</artifactId>
-				<version>1.0.0-beta4</version>
-<!--				<version>${langchain4j.version}</version>-->
+				<version>${langchain4j-beta.version}</version>
 			</dependency>
 			<!--社区版百炼-->
 			<dependency>
 				<groupId>dev.langchain4j</groupId>
 				<artifactId>langchain4j-community-dashscope</artifactId>
-				<version>1.0.0-beta4</version>
-<!--				<version>${langchain4j.version}</version>-->
+				<version>${langchain4j-beta.version}</version>
 			</dependency>
 <!--			<dependency>-->
 <!--				<groupId>dev.langchain4j</groupId>-->
@@ -87,8 +86,7 @@
 			<dependency>
 				<groupId>dev.langchain4j</groupId>
 				<artifactId>langchain4j-reactor</artifactId>
-				<version>1.0.0-beta4</version>
-<!--				<version>${langchain4j.version}</version>-->
+				<version>${langchain4j-beta.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
