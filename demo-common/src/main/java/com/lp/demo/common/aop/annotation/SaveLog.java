@@ -26,4 +26,9 @@ public @interface SaveLog {
     @AliasFor("params")
     String[] value() default {};
 
+    /**
+     * 参数位置对应对象的操作内容展示字段
+     */
+    String[] actionFields() default {};
+
 }

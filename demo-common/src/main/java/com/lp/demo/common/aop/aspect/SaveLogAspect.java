@@ -9,6 +9,7 @@ import cn.hutool.json.JSONUtil;
 import com.lp.demo.common.aop.annotation.MaskLog;
 import com.lp.demo.common.aop.annotation.SaveLog;
 import com.lp.demo.common.aop.service.OperationLogService;
+import com.lp.demo.common.config.DefaultMaskFieldsConfig;
 import com.lp.demo.common.util.ConsoleColorUtil;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +34,16 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * 使用@SaveLog添加日志
@@ -51,6 +55,8 @@ public class SaveLogAspect {
 
     @Autowired
     OperationLogService operationLogService;
+    @Autowired
+    DefaultMaskFieldsConfig defaultMaskFieldsConfig;
 
     // 切入点
     @Pointcut("@annotation(com.lp.demo.common.aop.annotation.SaveLog)")
@@ -261,8 +267,10 @@ public class SaveLogAspect {
             remoteAddress = request.getRemoteAddr();
         }
         String scene = operationLog.scene();
+        String[] actionFields = operationLog.actionFields();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
+        String clazzName = joinPoint.getTarget().getClass().getSimpleName();
         if (StringUtil.isEmpty(scene)) {
 //            RequiresPermissions rp = method.getAnnotation(RequiresPermissions.class); // 方法上其它带有描述的注解
 //            if (rp != null && rp.value().length > 0) {
@@ -273,7 +281,7 @@ public class SaveLogAspect {
         }
 
         // 处理入参
-        Map<String, Object> reqMap = new HashMap<>();
+        Map<String, Object> reqMap = new LinkedHashMap<>();
         Parameter[] params = method.getParameters();
         Object[] args = joinPoint.getArgs();
         if (ArrayUtil.isNotEmpty(params) && ArrayUtil.isNotEmpty(args)) {
@@ -290,28 +298,12 @@ public class SaveLogAspect {
                         paramValue = ((MultipartFile) paramValue).getOriginalFilename();
                     }
 
-                    if (ArrayUtil.isNotEmpty(masks) && masks.length > i) {
-                        MaskLog mask = masks.length == 1 ? masks[0] : masks[i];
-                        MaskLog.MaskLevelEnum maskLevel = mask.maskLevel();
-                        if (paramValue instanceof CharSequence || paramValue instanceof Number) {
-                            paramValue = this.mask(paramValue.toString(), maskLevel);
-                        } else {
-                            String reqStr = JSONUtil.toJsonStr(paramValue);
-                            JSONObject jsonObject = JSONUtil.parseObj(reqStr);
-                            if (jsonObject.isEmpty()) {
-                                paramValue = "";
-                            } else {
-                                for (String fd : mask.fields()) {
-                                    if (!jsonObject.containsKey(fd)) {
-                                        continue;
-                                    }
-                                    String s = jsonObject.get(fd).toString();
-                                    jsonObject.putOpt(fd, this.mask(s, maskLevel));
-                                }
-                                paramValue = jsonObject;
-                            }
-                        }
-                    }
+                    // 待完成，对全局敏感信息打码
+                    String[] defaultMaskAllFields = defaultMaskFieldsConfig.getMaskAllFields();
+                    String[] defaultMaskPartFields = defaultMaskFieldsConfig.getMaskPartFields();
+
+                    paramValue = this.doMaskValue(masks, i, paramName, paramValue);
+
                 }
                 reqMap.put(paramName, paramValue);
             }
@@ -326,12 +318,117 @@ public class SaveLogAspect {
         }
 
         System.out.println("reqMap = " + reqMap);
+        // 操作内容
+        String actionContent = ArrayUtil.isNotEmpty(actionFields) ? this.getCustomActionContent(reqMap, params, args, actionFields) : this.getDefaultActionContent(reqMap);
+        System.out.println("actionContent = " + actionContent);
 
         MethodInvocationProceedingJoinPoint mjoinpoint = (MethodInvocationProceedingJoinPoint) joinPoint;
         Object result = mjoinpoint.proceed(args != null ? args : new Object[0]);
 
         System.out.println("result = " + result);
         return result;
+    }
+
+
+    private Object doMaskValue(MaskLog[] masks, int i, String paramName, Object paramValue) {
+        if (ArrayUtil.isNotEmpty(masks) && masks.length > i) {
+            MaskLog mask = masks.length == 1 ? masks[0] : masks[i];
+            MaskLog.MaskLevelEnum maskLevel = mask.maskLevel();
+            if (paramValue instanceof CharSequence || paramValue instanceof Number) {
+                if (ArrayUtil.containsIgnoreCase(mask.fields(), paramName)) {
+                    paramValue = this.mask(paramValue.toString(), maskLevel);
+                }
+            } else {
+                JSONObject jsonObject = JSONUtil.parseObj(JSONUtil.toJsonStr(paramValue));
+                if (jsonObject.isEmpty()) {
+                    paramValue = "";
+                } else {
+                    for (String fd : mask.fields()) {
+                        if (!jsonObject.containsKey(fd)) {
+                            continue;
+                        }
+                        String s = jsonObject.get(fd).toString();
+                        jsonObject.putOpt(fd, this.mask(s, maskLevel));
+                    }
+                    paramValue = jsonObject;
+                }
+            }
+        }
+        return paramValue;
+    }
+
+    private String getDefaultActionContent(Map<String, Object> reqMap) {
+        StringJoiner resultJoiner = new StringJoiner(";");
+        int currentLength = 0;
+        for (Map.Entry<String, Object> entry : reqMap.entrySet()) {
+            String kvPair = entry.getKey() + ":" + (entry.getValue() != null ? entry.getValue().toString() : "null");
+            // 计算添加后的新长度（考虑分号分隔符）
+            int newLength = currentLength + (currentLength > 0 ? 1 : 0) + kvPair.length();
+            // 检查长度是否超过256，（数据库字段长度只留了256，更多内容需要修改数据库字段长度）
+            if (newLength > 256) {
+                break;
+            }
+            resultJoiner.add(kvPair);
+            currentLength = newLength;
+        }
+        return resultJoiner.toString();
+    }
+
+    private String getCustomActionContent(Map<String, Object> reqMap, Parameter[] params, Object[] args, String[] actionFields) {
+        StringJoiner actionContentJoiner = new StringJoiner(";");
+        // 构建操作内容 actionContent
+        if (ArrayUtil.isNotEmpty(actionFields)) {
+            for (int j = 0; j < actionFields.length; j++) {
+                // 解析字段配置（格式："字段名" 或 "字段名:描述名" 或 "字段所在参数索引#字段名" 或 "字段所在参数索引#字段名:描述名"）
+                String actionField = actionFields[j];
+                int fieldIndex = Math.min(j, Math.max(0, args.length - 1));
+                String fieldName;
+                String displayName;
+
+                // 解析字段所在参数位置
+                if (actionField.contains("#")) {
+                    String[] parts = actionField.split("#", 2);
+                    try {
+                        fieldIndex = Integer.parseInt(parts[0]);
+                    } catch (NumberFormatException e) {
+                        log.warn("get custom action content, but field index error, actionField: {}", actionField);
+                    }
+                    actionField = parts[1];
+                }
+
+                // 解析字段名、字段描述
+                if (actionField.contains(":")) {
+                    String[] parts = actionField.split(":", 2);
+                    fieldName = parts[0];
+                    displayName = parts[1];
+                } else {
+                    fieldName = actionField;
+                    displayName = actionField;
+                }
+
+                // 获取参数值（通过参数名从reqMap获取）
+                String paramName = params[fieldIndex].getName();
+                Object paramValue = reqMap.get(paramName);
+                Object fieldValue = null;
+                if (paramValue != null) {
+                    if (paramValue instanceof CharSequence || paramValue instanceof Number) {
+                        fieldValue = paramValue;
+                    } else if (paramValue instanceof Map) {
+                        fieldValue = ((Map<?, ?>) paramValue).get(fieldName);
+                    } else {
+                        try {
+                            Field field = paramValue.getClass().getDeclaredField(fieldName);
+                            field.setAccessible(true);
+                            fieldValue = field.get(paramValue);
+                        } catch (Exception ignored) {
+                            log.warn("get custom action content, but field not exist, fieldName: {}", fieldName);
+                        }
+                    }
+                }
+                actionContentJoiner.add(displayName + ":" + fieldValue);
+            }
+        }
+        return actionContentJoiner.toString();
     }
 
     @Around("@annotation(operationLog) || " +
@@ -408,6 +505,11 @@ public class SaveLogAspect {
                 return (methodAnnotation.value() == null || methodAnnotation.value().length < 1) ? clazzAnnotation.value() : methodAnnotation.value();
             }
 
+            @Override
+            public String[] actionFields() {
+                return (methodAnnotation.actionFields() == null || methodAnnotation.actionFields().length < 1) ? clazzAnnotation.actionFields() : methodAnnotation.actionFields();
+            }
+
             // 实现注解接口的其他必要方法...
             @Override
             public Class<? extends Annotation> annotationType() {
@@ -442,5 +544,12 @@ public class SaveLogAspect {
      *                  @MaskLog(fields = {"name"})
      *              }
      *     )
+     * 5、定义操作内容：（如果不定义，会最大限度在256内按序保存字段和值）
+     *      以修改考评方案为例子：
+     *      @SaveLog(value = SYSTEM,
+     *               scene = "修修修修修改方案",
+     *               masks = {@MaskLog, @MaskLog(fields = {"systemId", "typeId"})}, // 将类参数中的这两个字段部分打码
+     *               actionFields = {"0#id", "1#name:方案名称", "1#systemId"}) // 操作内容展示这三个字段值，0表示方法的第一个参数，1表示方法的第二个参数
+     *
      */
 }
