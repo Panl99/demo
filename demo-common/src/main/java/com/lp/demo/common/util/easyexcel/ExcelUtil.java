@@ -10,6 +10,11 @@ import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
 import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.lp.demo.common.exception.DisplayableException;
+import com.lp.demo.common.util.StringUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.util.CollectionUtils;
@@ -23,10 +28,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author lp
@@ -303,4 +312,239 @@ public class ExcelUtil {
             e.printStackTrace();
         }
     }
+
+
+
+    /**
+     * 导出
+     *
+     * @param response
+     * @param data
+     * @param fileName
+     * @param sheetName
+     * @param clazz
+     * @throws Exception
+     */
+    public static void export(HttpServletResponse response,
+                              List<?> data,
+                              String fileName,
+                              String sheetName,
+                              Class clazz) throws Exception {
+        byte[] excelBytes = generateExcelBytes(data, sheetName, clazz);
+        writeExcelToResponse(response, excelBytes, fileName);
+    }
+
+    /**
+     * 导出（支持每个Sheet不同数据类型）
+     *
+     * @param response
+     * @param sheetConfigs
+     * @param fileName
+     * @throws Exception
+     */
+    public static void export(HttpServletResponse response,
+                              List<SheetConfig> sheetConfigs,
+                              String fileName) throws Exception {
+        byte[] excelBytes = generateExcelBytes(sheetConfigs);
+        writeExcelToResponse(response, excelBytes, fileName);
+    }
+
+    private static void writeExcelToResponse(HttpServletResponse response, byte[] excelBytes, String fileName) throws Exception {
+        fileName = URLEncoder.encode(fileName, "UTF-8");
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + ExcelTypeEnum.XLSX.getValue());
+        response.setContentLength(excelBytes.length);
+        response.getOutputStream().write(excelBytes);
+        response.flushBuffer();
+    }
+
+    public static byte[] generateExcelBytes(List<SheetConfig> sheetConfigs) {
+        WriteCellStyle headWriteCellStyle = new WriteCellStyle();
+        headWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        WriteCellStyle contentWriteCellStyle = new WriteCellStyle();
+        contentWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        HorizontalCellStyleStrategy horizontalCellStyleStrategy = new HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ExcelWriter excelWriter = EasyExcel.write(byteArrayOutputStream)
+                .excelType(ExcelTypeEnum.XLSX)
+                .registerWriteHandler(horizontalCellStyleStrategy)
+                .build();
+
+        try {
+            int sheetIndex = 0;
+            for (SheetConfig config : sheetConfigs) {
+                String sheetName = config.getSheetName();
+                if (StringUtil.isEmpty(sheetName)) {
+                    sheetName = "Sheet" + (sheetIndex + 1);
+                }
+
+                WriteSheet writeSheet = EasyExcel.writerSheet(sheetIndex, sheetName)
+                        .head(config.getClazz())
+                        .excludeColumnFieldNames(config.getExcludeFields())
+                        .build();
+
+                excelWriter.write(config.getData(), writeSheet);
+                sheetIndex++;
+            }
+        } finally {
+            if (excelWriter != null) {
+                excelWriter.finish();
+            }
+        }
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public static byte[] generateExcelBytes(Map<String, List<?>> dataMap,
+                                            Class clazz,
+                                            Set<String> excludeFields) {
+        List<SheetConfig> sheetConfigs = new ArrayList<>(dataMap.size());
+        dataMap.forEach((k, v) ->
+                sheetConfigs.add(SheetConfig.builder()
+                        .sheetName(k)
+                        .data(v)
+                        .clazz(clazz)
+                        .excludeFields(excludeFields)
+                        .build()));
+        return generateExcelBytes(sheetConfigs);
+    }
+
+    public static byte[] generateExcelBytes(List<?> data,
+                                            String sheetName,
+                                            Class clazz,
+                                            Set<String> excludeFields) {
+        return generateExcelBytes(Collections.singletonList(SheetConfig.builder()
+                .data(data)
+                .sheetName(sheetName)
+                .clazz(clazz)
+                .excludeFields(excludeFields)
+                .build()));
+    }
+
+    public static byte[] generateExcelBytes(List<?> data,
+                                            String sheetName,
+                                            Class clazz) {
+        return generateExcelBytes(data, sheetName, clazz, Collections.emptySet());
+    }
+
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SheetConfig {
+        private List<?> data;
+        private Class<?> clazz;
+        private Set<String> excludeFields;
+        private String sheetName;
+    }
+
+
+    /**
+     * 生成Excel并直接上传到OSS（支持每个Sheet不同数据类型）
+     *
+     * @param sheetConfigs sheet配置列表
+     * @param fileName     文件名
+     * @param basePath     基础路径
+     * @return
+     */
+    public static String uploadExportFileToOSS(List<SheetConfig> sheetConfigs,
+                                               String fileName,
+                                               String basePath) {
+        byte[] excelBytes = generateExcelBytes(sheetConfigs);
+
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String fullFileName = fileName + "_" + timestamp + ExcelTypeEnum.XLSX.getValue();
+        if (StringUtil.isEmpty(basePath)) {
+            String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            basePath = "/file/" + date + "/";
+        }
+
+        return basePath; // + UploadUtil.upload2OSS(excelBytes, "xlsx", basePath, fullFileName);
+    }
+
+    /**
+     * 生成Excel并直接上传到OSS
+     *
+     * @param dataMap  数据集<sheetName, sheetContent>
+     * @param fileName 文件名
+     * @param clazz    类型
+     * @param basePath 基础路径
+     * @return
+     */
+    public static String uploadExportFileToOSS(Map<String, List<?>> dataMap,
+                                               String fileName,
+                                               Class clazz,
+                                               Set<String> excludeFields,
+                                               String basePath) {
+        List<SheetConfig> sheetConfigs = new ArrayList<>(dataMap.size());
+        dataMap.forEach((k, v) ->
+                sheetConfigs.add(SheetConfig.builder()
+                        .sheetName(k)
+                        .data(v)
+                        .clazz(clazz)
+                        .excludeFields(excludeFields)
+                        .build()));
+        return uploadExportFileToOSS(sheetConfigs, fileName, basePath);
+    }
+
+    /**
+     * 生成Excel并直接上传到OSS
+     *
+     * @param dataMap  数据集<sheetName, sheetContent>
+     * @param fileName 文件名
+     * @param clazz    类型
+     * @param basePath 基础路径
+     * @return
+     */
+    public static String uploadExportFileToOSS(Map<String, List<?>> dataMap,
+                                               String fileName,
+                                               Class clazz,
+                                               String basePath) {
+        return uploadExportFileToOSS(dataMap, fileName, clazz, Collections.emptySet(), basePath);
+    }
+
+
+    /**
+     * 生成Excel并直接上传到OSS
+     *
+     * @param data          数据列表
+     * @param fileName      文件名
+     * @param sheetName     sheet名
+     * @param clazz         类型
+     * @param excludeFields 排除字段
+     * @param basePath      基础路径
+     * @return
+     */
+    public static String uploadExportFileToOSS(List<?> data,
+                                               String fileName,
+                                               String sheetName,
+                                               Class clazz,
+                                               Set<String> excludeFields,
+                                               String basePath) {
+        return uploadExportFileToOSS(Collections.singletonMap(sheetName, data), fileName, clazz, excludeFields, basePath);
+    }
+
+    /**
+     * 生成Excel并直接上传到OSS
+     *
+     * @param data      数据列表
+     * @param fileName  文件名
+     * @param sheetName sheet名
+     * @param clazz     类型
+     * @param basePath  基础路径
+     * @return
+     */
+    public static String uploadExportFileToOSS(List<?> data,
+                                               String fileName,
+                                               String sheetName,
+                                               Class clazz,
+                                               String basePath) {
+        return uploadExportFileToOSS(data, fileName, sheetName, clazz, Collections.emptySet(), basePath);
+    }
+
+
+
 }
