@@ -1,8 +1,14 @@
 package com.lp.demo.action.java_in_action;
 
+import com.lp.demo.action.java_in_action.CompletableFuture.DefaultValueHandle;
+import com.lp.demo.action.java_in_action.CompletableFuture.LogErrorAction;
+
+import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,6 +32,7 @@ public class CompletableFutureDemo {
         testWhenComplete();
         testThenAccept();
         testThenRun();
+        testThenCombine();
     }
 
 
@@ -122,6 +129,29 @@ public class CompletableFutureDemo {
     public static void testThenRun() {
         CompletableFuture.supplyAsync(() -> 100)
                 .thenRun(() -> System.out.println("testThenRun..."));
+    }
+
+    /**
+     * thenCombine
+     * 有三个操作step1、step2、step3存在依赖关系，其中step3的执行依赖step1和step2的结果
+     */
+    public static void testThenCombine() {
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("执行step1");
+            return "step1result";
+        }, executor);
+        CompletableFuture<String> cf2 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("执行step2");
+            return "step2result";
+        }, executor);
+        cf1.thenCombine(cf2, (result1, result2) -> {
+            System.out.println(result1 + "," + result2);
+            System.out.println("执行step3");
+            return "step3result";
+        }).thenAccept(result3 -> System.out.println(result3))
+                .whenComplete(new LogErrorAction<>("testThenCombine.LogErrorAction", 11, 22, 33))
+                .handle(new DefaultValueHandle<>("testThenCombine.DefaultValueHandle", Collections.emptyMap(), 44, null, 66));
     }
 
 }
