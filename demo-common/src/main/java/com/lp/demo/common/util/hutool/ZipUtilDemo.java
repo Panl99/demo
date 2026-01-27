@@ -56,8 +56,8 @@ public class ZipUtilDemo {
 
         // 删除解压文件
 
-        String path = "D:\\Code\\jingxun\\test333.zip";
-        String pathCn = "D:\\Life\\work\\jingxun\\智能手表\\表盘文件-test.zip";
+        String path = "D:\\Code\\company\\test333.zip";
+        String pathCn = "D:\\Life\\work\\company\\智能手表\\表盘文件-test.zip";
         File file = new File(path);
 //        unzip(file); Charset.defaultCharset();
         unzip(pathCn);
@@ -264,7 +264,7 @@ public class ZipUtilDemo {
         String now = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date);
         for (Dial dial : dials) {
             // 上传图片
-            String oss = "https://ossscn.jingxun.xyz/";
+            String oss = "https://ossscn.company.xyz/";
             if (dial.getImgBytes() != null) {
                 String imageBasePath = "watch_band/dial/image/";
                 String imageType = "png";
