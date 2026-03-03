@@ -33,7 +33,8 @@ public class JacksonSerializer {
         serializers.put(Long.class, ToStringSerializer.instance);
         serializers.put(Long.TYPE, ToStringSerializer.instance);
         serializers.put(BigInteger.class, ToStringSerializer.instance);
-        serializers.put(BigDecimal.class, new BigDecimalSerializer());
+//        serializers.put(BigDecimal.class, new BigDecimalSerializer());
+        serializers.put(BigDecimal.class, new FlexibleDecimalSerializer());
 
         return builder -> builder.serializersByType(serializers);
     }
