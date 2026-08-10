@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class RedisDelayedQueue {
 
+    private static final String DELAYED_QUEUE_TIMEOUT_PREFIX = "redisson_delay_queue_timeout:";
+
     @Autowired
     private RedissonClient redissonClient;
 
@@ -46,6 +48,24 @@ public class RedisDelayedQueue {
         RDelayedQueue<String> delayedQueue = redissonClient.getDelayedQueue(blockingQueue);
         String msg = blockingQueue.take();
         // handle msg
+    }
+
+
+
+    /**
+     * 判断队列中（包括未到期和已到期）是否存在该消息
+     * 注意：由于序列化问题，此方法只能用于基本类型或确保 equals/hashCode 正确的对象
+     *
+     * @param queueName 队列名
+     * @param message   消息内容
+     */
+    public static <T> boolean contains(String queueName, T message) {
+        RScoredSortedSet<T> timeoutSet = redissonClient.getScoredSortedSet(DELAYED_QUEUE_TIMEOUT_PREFIX + queueName);
+        if (timeoutSet.contains(message)) {
+            return true;
+        }
+        RBlockingQueue<T> blockingQueue = redissonClient.getBlockingQueue(queueName);
+        return blockingQueue.contains(message);
     }
 
 }
